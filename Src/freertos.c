@@ -56,15 +56,23 @@
 #include "u8g2_arm.h"
 #include <stdio.h>
 #include "speed.h"
+#include "usart.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
 osThreadId mySpeedHandle;
 osThreadId myBlinkHandle;
+osSemaphoreId myBinarySemUART_ISRHandle;
 
 /* USER CODE BEGIN Variables */
 u8g2_t u8g2;
+//uint8_t b1[];
+#define BUFFSIZE 3
+char b1[BUFFSIZE];
+__IO ITStatus UartReady = RESET;
+
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -75,7 +83,23 @@ void StartBlink(void const * argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* USER CODE BEGIN FunctionPrototypes */
-
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+	if (UartHandle->Instance == USART1)
+	{
+		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+		HAL_UART_Transmit(&huart1,(uint8_t *)&b1,BUFFSIZE,100);
+		if (strncmp (b1, "abc", 3) == 0) 
+		{
+			HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+		}
+		  HAL_UART_Receive_IT(&huart1,(uint8_t *)&b1,BUFFSIZE);
+		//if (strcmp (b1, "123\r")==0) HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+		//uint8_t c3po[]="\r\n";
+		//HAL_UART_Transmit(&huart1,(uint8_t *)&c3po,1,100);
+		//UartReady = SET;
+	}
+}
 /* USER CODE END FunctionPrototypes */
 
 /* Hook prototypes */
@@ -91,6 +115,11 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
+  /* Create the semaphores(s) */
+  /* definition and creation of myBinarySemUART_ISR */
+  osSemaphoreDef(myBinarySemUART_ISR);
+  myBinarySemUART_ISRHandle = osSemaphoreCreate(osSemaphore(myBinarySemUART_ISR), 1);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -105,7 +134,7 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of mySpeed */
-  osThreadDef(mySpeed, StartSpeed, osPriorityNormal, 0, 128);
+  osThreadDef(mySpeed, StartSpeed, osPriorityNormal, 1, 128);
   mySpeedHandle = osThreadCreate(osThread(mySpeed), NULL);
 
   /* definition and creation of myBlink */
@@ -145,7 +174,9 @@ void StartSpeed(void const * argument)
 	//rallycomp();
 	speedo();
 	u8g2_SendBuffer(&u8g2);	
-    osDelay(1000);
+	//uint8_t c3po[]="Sir, the possibility of successfully navigating an asteroid field is approximately 3,720 to 1 \r\n";
+	//HAL_UART_Transmit(&huart1,(uint8_t *)&b1,97,100);
+   osDelay(1000);
   }
   /* USER CODE END StartSpeed */
 }
@@ -154,17 +185,21 @@ void StartSpeed(void const * argument)
 void StartBlink(void const * argument)
 {
   /* USER CODE BEGIN StartBlink */
+			if(HAL_UART_Receive_IT(&huart1, (uint8_t *)&b1,BUFFSIZE)== !HAL_OK)
+		{
+			//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+		}
   /* Infinite loop */
   for(;;)
   {
-		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
-    osDelay(100);
+		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+
+    osDelay(10);
   }
   /* USER CODE END StartBlink */
 }
 
 /* USER CODE BEGIN Application */
-     
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -24,6 +24,7 @@ lcd_st7920\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 lcd_st7920\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 lcd_st7920\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 lcd_st7920\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
+lcd_st7920\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 lcd_st7920\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 lcd_st7920\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 lcd_st7920\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
@@ -40,6 +41,7 @@ lcd_st7920\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 lcd_st7920\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 lcd_st7920\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 lcd_st7920\main.o: ../Inc/spi.h
+lcd_st7920\main.o: ../Inc/usart.h
 lcd_st7920\main.o: ../Inc/gpio.h
 lcd_st7920\main.o: ../Inc/u8g2.h
 lcd_st7920\main.o: ../Inc/u8x8.h

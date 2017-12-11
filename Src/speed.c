@@ -15,7 +15,10 @@ uint32_t a=0;
 
 void speedo(void) {         
   u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);  
-  u8g2_DrawStr(&u8g2,-5,30,"  0");
+  //u8g2_DrawStr(&u8g2,-5,30,"  0");
+	sprintf(buf, "%i\n", a);
+	u8g2_DrawStr(&u8g2,0,30,buf);
+	a++;
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
   u8g2_DrawStr(&u8g2,53,30,"Km/h");
   u8g2_DrawStr(&u8g2,0,45,"A+:40576.2");
@@ -38,7 +41,7 @@ void distance_output(struct float_distance distance, int horisontal_position, in
 	
  if (distance.kilometers < 10) horisontal_position = horisontal_position + 2 * 19;
  else if (distance.kilometers < 100) horisontal_position = horisontal_position + 19;
- sprintf(buf, "%i\n", distance.kilometers);
+ sprintf(buf, "%i\n", distance.ten_meteres);
  u8g2_DrawStr(&u8g2,horisontal_position,vertical_position,buf);
  
 }
@@ -57,7 +60,7 @@ void rallycomp(void){
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
   u8g2_DrawStr(&u8g2,18,28,"TOT");
   u8g2_DrawStr(&u8g2,18,60,"INT");
-  interval.ten_meteres+=10;
+  interval.ten_meteres++;
 	if (interval.ten_meteres == 100)
 	{
 		interval.ten_meteres=0;
