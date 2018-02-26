@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'LCD_ST7920' 
+ * Project: 'GPSpeedometer' 
  * Target:  'LCD_ST7920' 
  */
 

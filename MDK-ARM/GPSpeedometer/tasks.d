@@ -1,0 +1,17 @@
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c
+.\gpspeedometer\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\gpspeedometer\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+.\gpspeedometer\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+.\gpspeedometer\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\gpspeedometer\tasks.o: ../Inc/FreeRTOSConfig.h
+.\gpspeedometer\tasks.o: ../Inc/main.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+.\gpspeedometer\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/StackMacros.h

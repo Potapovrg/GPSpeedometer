@@ -1,0 +1,16 @@
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/queue.c
+.\gpspeedometer\queue.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\gpspeedometer\queue.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+.\gpspeedometer\queue.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+.\gpspeedometer\queue.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\gpspeedometer\queue.o: ../Inc/FreeRTOSConfig.h
+.\gpspeedometer\queue.o: ../Inc/main.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+.\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h

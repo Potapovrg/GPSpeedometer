@@ -9,7 +9,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2017 STMicroelectronics International N.V. 
+  * Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -62,42 +62,48 @@
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
-osThreadId mySpeedHandle;
-osThreadId myBlinkHandle;
+osThreadId myLCDHandle;
+osThreadId myGPS_parserHandle;
 osSemaphoreId myBinarySemUART_ISRHandle;
 
 /* USER CODE BEGIN Variables */
 u8g2_t u8g2;
-//uint8_t b1[];
-#define BUFFSIZE 3
-char b1[BUFFSIZE];
+#define BUFFSIZE 75
+#define StartParcing() HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1)
+char UART_byte=0;
+char GPS_buffer[BUFFSIZE];
+uint8_t GPS_buff_pos = 0;
 __IO ITStatus UartReady = RESET;
 
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
-void StartSpeed(void const * argument);
-void StartBlink(void const * argument);
+void StartLCD(void const * argument);
+void StarGPS_parser(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* USER CODE BEGIN FunctionPrototypes */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
+	static portBASE_TYPE xHigherPriorityTaskWoken;
+	xHigherPriorityTaskWoken = pdFALSE;
+	
 	if (UartHandle->Instance == USART1)
 	{
-		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
-		HAL_UART_Transmit(&huart1,(uint8_t *)&b1,BUFFSIZE,100);
-		if (strncmp (b1, "abc", 3) == 0) 
+		if (UART_byte == 0x0D)
 		{
-			HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+			HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
+			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
+			if( xHigherPriorityTaskWoken == pdTRUE ) taskYIELD();	
 		}
-		  HAL_UART_Receive_IT(&huart1,(uint8_t *)&b1,BUFFSIZE);
-		//if (strcmp (b1, "123\r")==0) HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
-		//uint8_t c3po[]="\r\n";
-		//HAL_UART_Transmit(&huart1,(uint8_t *)&c3po,1,100);
-		//UartReady = SET;
+		else 
+		{
+			GPS_buffer[GPS_buff_pos]=UART_byte;
+			GPS_buff_pos++;
+			HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+		}
 	}
 }
 /* USER CODE END FunctionPrototypes */
@@ -133,13 +139,13 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  /* definition and creation of mySpeed */
-  osThreadDef(mySpeed, StartSpeed, osPriorityNormal, 1, 128);
-  mySpeedHandle = osThreadCreate(osThread(mySpeed), NULL);
+  /* definition and creation of myLCD */
+  osThreadDef(myLCD, StartLCD, osPriorityNormal, 0, 128);
+  myLCDHandle = osThreadCreate(osThread(myLCD), NULL);
 
-  /* definition and creation of myBlink */
-  osThreadDef(myBlink, StartBlink, osPriorityIdle, 0, 128);
-  myBlinkHandle = osThreadCreate(osThread(myBlink), NULL);
+  /* definition and creation of myGPS_parser */
+  osThreadDef(myGPS_parser, StarGPS_parser, osPriorityIdle, 0, 128);
+  myGPS_parserHandle = osThreadCreate(osThread(myGPS_parser), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -163,40 +169,42 @@ void StartDefaultTask(void const * argument)
   /* USER CODE END StartDefaultTask */
 }
 
-/* StartSpeed function */
-void StartSpeed(void const * argument)
+/* StartLCD function */
+void StartLCD(void const * argument)
 {
-  /* USER CODE BEGIN StartSpeed */
+  /* USER CODE BEGIN StartLCD */
   /* Infinite loop */
   for(;;)
   {
-	u8g2_ClearBuffer(&u8g2);
-	//rallycomp();
-	speedo();
-	u8g2_SendBuffer(&u8g2);	
-	//uint8_t c3po[]="Sir, the possibility of successfully navigating an asteroid field is approximately 3,720 to 1 \r\n";
-	//HAL_UART_Transmit(&huart1,(uint8_t *)&b1,97,100);
-   osDelay(1000);
+		u8g2_ClearBuffer(&u8g2);
+		//rallycomp();
+		speedo();
+		//u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+		//u8g2_DrawStr(&u8g2,30,30,GPS_buffer);
+		u8g2_SendBuffer(&u8g2);	
+    osDelay(1000);
   }
-  /* USER CODE END StartSpeed */
+  /* USER CODE END StartLCD */
 }
 
-/* StartBlink function */
-void StartBlink(void const * argument)
+/* StarGPS_parser function */
+void StarGPS_parser(void const * argument)
 {
-  /* USER CODE BEGIN StartBlink */
-			if(HAL_UART_Receive_IT(&huart1, (uint8_t *)&b1,BUFFSIZE)== !HAL_OK)
-		{
-			//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
-		}
+  /* USER CODE BEGIN StarGPS_parser */
+	enum GPS_parser_state {String_start, String_type, String_parsing};
+	enum GPS_parser_state State = String_start;
+	StartParcing();
   /* Infinite loop */
   for(;;)
   {
-		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
-
-    osDelay(10);
+		xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
+		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);					
+		HAL_UART_Transmit(&huart1,(uint8_t *)&GPS_buffer,GPS_buff_pos,100);
+		GPS_buff_pos=0;
+		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+    //osDelay(1);
   }
-  /* USER CODE END StartBlink */
+  /* USER CODE END StarGPS_parser */
 }
 
 /* USER CODE BEGIN Application */

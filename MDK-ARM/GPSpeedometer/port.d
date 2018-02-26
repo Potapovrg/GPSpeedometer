@@ -1,0 +1,13 @@
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/port.c
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+.\gpspeedometer\port.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+.\gpspeedometer\port.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\gpspeedometer\port.o: ../Inc/FreeRTOSConfig.h
+.\gpspeedometer\port.o: ../Inc/main.h
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+.\gpspeedometer\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h

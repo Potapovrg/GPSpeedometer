@@ -9,7 +9,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2017 STMicroelectronics International N.V. 
+  * Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -110,10 +110,8 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-  //HAL_Delay(10);
 	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
 	u8g2_InitDisplay(&u8g2);
-	//HAL_Delay(100);	
 	u8g2_SetPowerSave(&u8g2, 0); /* 
 	wake up display. Need to add display clear to this function:
 	U8X8_C(0x001),
