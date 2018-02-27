@@ -283,6 +283,8 @@ void StarGPS_parser(void const * argument)
 			u8g2_DrawStr(&u8g2,0,40+3*OFFSET,Screen_buffer);
 			sprintf(Screen_buffer, "Status:%c", GPS.status);
 			u8g2_DrawStr(&u8g2,0,50+4*OFFSET,Screen_buffer);
+			sprintf(Screen_buffer, "Speed:%3d.%3d",GPS.Speed.knots,GPS.Speed.tenth_knots);
+			u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);
 			u8g2_SendBuffer(&u8g2);	
 		}
 		GPS_buff_pos=0;
