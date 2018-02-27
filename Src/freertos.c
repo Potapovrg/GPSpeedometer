@@ -68,11 +68,52 @@ osSemaphoreId myBinarySemUART_ISRHandle;
 
 /* USER CODE BEGIN Variables */
 u8g2_t u8g2;
-#define BUFFSIZE 75
+#define BUFFSIZE 100
 #define StartParcing() HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1)
+#define OFFSET 1
+#define HEIGHT
 char UART_byte=0;
 char GPS_buffer[BUFFSIZE];
+char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
+int h, m, s;
+typedef struct GPS_data{
+	char status;
+	struct {
+		int h;
+		int m;
+		int s;
+		int ms;
+	} Time;
+	struct {
+		int degrees;
+		int minutes;
+		int tenth_minutes;
+		char sign;
+	} Latitude;
+	struct {
+		int degrees;
+		int minutes;
+		int tenth_minutes;
+		char sign;
+	} Longitude;
+	struct {
+		int knots;
+		int tenth_knots;
+	} Speed;
+	struct {
+		int degrees;
+		int tenth_degrees;
+	} Course;
+	struct {
+		int day;
+		int month;
+		int year;
+	}Date;
+	
+}GPS_data;
+
+GPS_data GPS;
 __IO ITStatus UartReady = RESET;
 
 /* USER CODE END Variables */
@@ -89,12 +130,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken = pdFALSE;
-	
+		
 	if (UartHandle->Instance == USART1)
 	{
-		if (UART_byte == 0x0D)
+		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
+		if (UART_byte == 0x0A)
 		{
-			HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
 			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
 			if( xHigherPriorityTaskWoken == pdTRUE ) taskYIELD();	
 		}
@@ -178,10 +219,10 @@ void StartLCD(void const * argument)
   {
 		u8g2_ClearBuffer(&u8g2);
 		//rallycomp();
-		speedo();
+		//speedo();
 		//u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 		//u8g2_DrawStr(&u8g2,30,30,GPS_buffer);
-		u8g2_SendBuffer(&u8g2);	
+		//u8g2_SendBuffer(&u8g2);	
     osDelay(1000);
   }
   /* USER CODE END StartLCD */
@@ -193,13 +234,57 @@ void StarGPS_parser(void const * argument)
   /* USER CODE BEGIN StarGPS_parser */
 	enum GPS_parser_state {String_start, String_type, String_parsing};
 	enum GPS_parser_state State = String_start;
+	osDelay(1000);
 	StartParcing();
   /* Infinite loop */
   for(;;)
   {
 		xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);					
-		HAL_UART_Transmit(&huart1,(uint8_t *)&GPS_buffer,GPS_buff_pos,100);
+		//HAL_UART_Transmit(&huart1,(uint8_t *)&GPS_buffer,GPS_buff_pos,100);
+		/*
+		if (strncmp(GPS_buffer, "$GNGLL", 6)==0)
+		{
+			u8g2_ClearBuffer(&u8g2);
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_DrawStr(&u8g2,0,10,"$GNGLL OK");
+			u8g2_SendBuffer(&u8g2);	
+		}
+		if (strncmp(GPS_buffer, "$GNRMC", 6)==0)
+		{
+			u8g2_ClearBuffer(&u8g2);
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_DrawStr(&u8g2,0,20,"$GNRMC OK");
+			u8g2_SendBuffer(&u8g2);	
+		}
+			if (strncmp(GPS_buffer, "$GNGSA", 6)==0)
+		{
+			u8g2_ClearBuffer(&u8g2);
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_DrawStr(&u8g2,0,30,"$GNGSA OK");
+			u8g2_SendBuffer(&u8g2);	
+		}
+		*/
+		if (strncmp(GPS_buffer, "$GNRMC", 6)==0)
+		{
+			//07:38:10  $GNRMC,073810.00,A,5140.89642,N,03910.49043,E,0.260,,270218,,,A*69
+			sscanf(GPS_buffer, "$GNRMC,%2d%2d%2d.%2d,%c,%2d%2d.%5d,%c,%3d%2d.%5d,%c,%3d.%3d,%3d.%3d,%2d%2d%2d",&GPS.Time.h,&GPS.Time.m,&GPS.Time.s,&GPS.Time.ms,&GPS.status,
+			&GPS.Latitude.degrees,&GPS.Latitude.minutes,&GPS.Latitude.tenth_minutes,&GPS.Latitude.sign,&GPS.Longitude.degrees,&GPS.Longitude.minutes,&GPS.Longitude.tenth_minutes,
+			&GPS.Longitude.sign,&GPS.Speed.knots,&GPS.Speed.tenth_knots,&GPS.Course.degrees,&GPS.Course.tenth_degrees,&GPS.Date.day,&GPS.Date.month,&GPS.Date.year);
+			u8g2_ClearBuffer(&u8g2);
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			sprintf(Screen_buffer, "Time:%02d:%02d:%02d", GPS.Time.h+3,GPS.Time.m,GPS.Time.s);
+			u8g2_DrawStr(&u8g2,0,10,Screen_buffer);
+			sprintf(Screen_buffer, "%02d.%02d.%4d", GPS.Date.day,GPS.Date.month,GPS.Date.year+2000);
+			u8g2_DrawStr(&u8g2,0,20+OFFSET,Screen_buffer);
+			sprintf(Screen_buffer, "%02d %02d.%03d %c", GPS.Latitude.degrees,GPS.Latitude.minutes,GPS.Latitude.tenth_minutes,GPS.Latitude.sign);
+			u8g2_DrawStr(&u8g2,0,30+2*OFFSET,Screen_buffer);
+			sprintf(Screen_buffer, "%2d %02d.%03d %c", GPS.Longitude.degrees,GPS.Longitude.minutes,GPS.Longitude.tenth_minutes,GPS.Longitude.sign);
+			u8g2_DrawStr(&u8g2,0,40+3*OFFSET,Screen_buffer);
+			sprintf(Screen_buffer, "Status:%c", GPS.status);
+			u8g2_DrawStr(&u8g2,0,50+4*OFFSET,Screen_buffer);
+			u8g2_SendBuffer(&u8g2);	
+		}
 		GPS_buff_pos=0;
 		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
     //osDelay(1);

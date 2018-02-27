@@ -27,7 +27,18 @@ Project File Date:  02/21/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'GPSpeedometer'
-".\GPSpeedometer\GPSpeedometer.axf" - 0 Error(s), 0 Warning(s).
+compiling freertos.c...
+../Inc/u8g2_arm.h(19): warning:  #1-D: last line of file ends without a newline
+   
+../Inc/speed.h(6): warning:  #1-D: last line of file ends without a newline
+  extern u8g2_t u8g2;
+../Src/freertos.c(236): warning:  #177-D: variable "State"  was declared but never referenced
+  	enum GPS_parser_state State = String_start;
+../Src/freertos.c: 3 warnings, 0 errors
+linking...
+Program Size: Code=16328 RO-data=1836 RW-data=128 ZI-data=5864  
+FromELF: creating hex file...
+".\GPSpeedometer\GPSpeedometer.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
