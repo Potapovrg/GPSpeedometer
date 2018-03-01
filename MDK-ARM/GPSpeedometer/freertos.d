@@ -46,3 +46,4 @@
 .\gpspeedometer\freertos.o: ../Inc/speed.h
 .\gpspeedometer\freertos.o: ../Inc/usart.h
 .\gpspeedometer\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\gpspeedometer\freertos.o: ../Inc/GPS_Parser.h

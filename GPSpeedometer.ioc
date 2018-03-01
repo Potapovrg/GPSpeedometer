@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-FREERTOS.BinarySemaphores01=myBinarySemUART_ISR,Dynamic,NULL
+FREERTOS.BinarySemaphores01=myBinarySemUART_ISR,Dynamic,NULL;myBinarySemDisplay_Data,Dynamic,NULL
 FREERTOS.FootprintOK=true
 FREERTOS.INCLUDE_vTaskDelayUntil=1
 FREERTOS.IPParameters=Tasks01,FootprintOK,INCLUDE_vTaskDelayUntil,BinarySemaphores01
