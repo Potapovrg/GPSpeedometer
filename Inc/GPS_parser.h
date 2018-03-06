@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <math.h>
+
 #define BUFFSIZE 200
 #define TIME_FORMAT "%2d%2d%2d.%2d"
 #define TIME_POSITION 0
@@ -62,6 +66,7 @@ typedef struct {
 	
 }GPS_data;
 
-typedef enum {GNRMC,GNVTG} string_type;
+
+//typedef enum {GNRMC,GNVTG} string_type;
 
 void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS);
