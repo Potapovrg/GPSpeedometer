@@ -76,6 +76,7 @@ u8g2_t u8g2;
 char UART_byte=0;
 char GPS_buffer[BUFFSIZE];
 char GPS_buffer1[] = "$GNRMC,073810.00,A,5140.89642,N,03910.49043,E,0.260,,270218,,,A*69";
+volatile uint8_t CPU_USAGE = 0, MAX_CPU_USAGE = 0;
 char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
 int h, m, s;
@@ -147,15 +148,15 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityIdle, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myLCD */
-  osThreadDef(myLCD, StartLCD, osPriorityNormal, 0, 128);
+  osThreadDef(myLCD, StartLCD, osPriorityBelowNormal, 0, 128);
   myLCDHandle = osThreadCreate(osThread(myLCD), NULL);
 
   /* definition and creation of myGPS_parser */
-  osThreadDef(myGPS_parser, StarGPS_parser, osPriorityIdle, 0, 128);
+  osThreadDef(myGPS_parser, StarGPS_parser, osPriorityNormal, 0, 128);
   myGPS_parserHandle = osThreadCreate(osThread(myGPS_parser), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -173,10 +174,20 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+	        portTickType LastTick = 0; 
+        uint16_t count = 0;                //??? ??????? ???????
+        uint16_t max_count = 0;            //???????????? ???????? ????????, ??????????? ??? ?????????? ? ????????????? 100% CPU idle
   for(;;)
   {
-    osDelay(1);
-  }
+    if(xTaskGetTickCount()-LastTick > 1000)    { //???? ?????? 1000 ????? (1 ??? ??? ???? ????????)
+                        LastTick = xTaskGetTickCount();
+                        if(count > max_count) max_count = count;          //??? ??????????
+                        CPU_USAGE = 100-(100 * count / max_count);               //????????? ??????? ????????
+                        if(CPU_USAGE>MAX_CPU_USAGE) MAX_CPU_USAGE = CPU_USAGE;// ??????? ????????
+                        count = 0;                                        //???????? ???????
+                }
+                count++;                                                  //?????????? ????????
+        }
   /* USER CODE END StartDefaultTask */
 }
 
