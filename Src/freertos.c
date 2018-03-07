@@ -87,7 +87,7 @@ __IO ITStatus UartReady = RESET;
 float distance;
 
 Position p1 = {514090700,391050500};
-Position p2 = {514105600,391093400};
+Position p2 = {514092900,391065800};
 
 
 
@@ -225,6 +225,7 @@ void StartLCD(void const * argument)
 		u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);
 		u8g2_SendBuffer(&u8g2);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
+		distance=DistanceKm(&p1,&p2);
     osDelay(100);
   }
   /* USER CODE END StartLCD */
