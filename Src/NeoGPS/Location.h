@@ -1,7 +1,7 @@
 /*#ifndef NEOGPS_LOCATION_H
 #define NEOGPS_LOCATION_H*/
 
-
+//#include "GPS_Parser.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
@@ -32,14 +32,59 @@
 #define DEG_PER_RAD 180.0 / PI
 #define MI_PER_KM 0.621371
 
+#ifndef GPS_DATA_STRUCT
+#define GPS_DATA_STRUCT
+typedef struct {
+	char status;
+	char RMC_status;
+	char VTG_status;
+	struct {
+		int h;
+		int m;
+		int s;
+		int ms;
+	} Time;
+	struct {
+		int degrees;
+		int minutes;
+		int tenth_minutes;
+		char sign;
+	} Latitude;
+	struct {
+		int degrees;
+		int minutes;
+		int tenth_minutes;
+		char sign;
+	} Longitude;
+	struct {
+		int kelometers;
+		int tenth_kelometers;
+	} Speed;
+	struct {
+		int degrees;
+		int tenth_degrees;
+	} Course;
+	struct {
+		int day;
+		int month;
+		int year;
+	}Date;
+	struct {
+	int32_t lat;
+	int32_t lon;
+	}Position;
+	
+}GPS_data;
 
 typedef struct {
 	int32_t Lat;
 	int32_t Lon;
 }Position;
 
-float EquirectDistanceRadians (Position *p1, Position *p2);
-float DistanceKm(Position *p1, Position *p2);
+#endif
+
+float EquirectDistanceRadians (GPS_data *p1, GPS_data *p2);
+float DistanceKm(GPS_data *p1, GPS_data *p2);
 
 
 /*

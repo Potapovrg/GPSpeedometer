@@ -86,8 +86,9 @@ GPS_data GPS;
 __IO ITStatus UartReady = RESET;
 float distance;
 
-Position p1 = {514090700,391050500};
-Position p2 = {514092900,391065800};
+GPS_data p1,p2; 
+//,391050500};
+//Position p2 = {514092900,391065800};
 
 
 
@@ -209,6 +210,7 @@ void StartLCD(void const * argument)
   for(;;)
   {
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
+		//speedo();
 		u8g2_ClearBuffer(&u8g2);
 		u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 		sprintf(Screen_buffer, "Time:%02d:%02d:%02d", GPS.Time.h+3,GPS.Time.m,GPS.Time.s);
@@ -221,11 +223,11 @@ void StartLCD(void const * argument)
 		u8g2_DrawStr(&u8g2,0,40+3*OFFSET,Screen_buffer);
 		sprintf(Screen_buffer, "Status:%c", GPS.status);
 		u8g2_DrawStr(&u8g2,0,50+4*OFFSET,Screen_buffer);
-		sprintf(Screen_buffer, "Speed:%3d.%2d",GPS.Speed.kelometers,GPS.Speed.tenth_kelometers);
+		//sprintf(Screen_buffer, "Speed:%3d.%2d",GPS.Speed.kelometers,GPS.Speed.tenth_kelometers);
+		sprintf(Screen_buffer, "DST:%1.3f",distance);
 		u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);
 		u8g2_SendBuffer(&u8g2);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
-		distance=DistanceKm(&p1,&p2);
     osDelay(100);
   }
   /* USER CODE END StartLCD */
@@ -236,12 +238,15 @@ void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
 	//osDelay(1000);
+	p1.Position.lat=514092900;
+	p1.Position.lon=391065800;
 	StartParcing();
   /* Infinite loop */
   for(;;)
   {
 		xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS);
+		distance=DistanceKm(&p1,&GPS);
 		GPS_buff_pos=0;
 		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
