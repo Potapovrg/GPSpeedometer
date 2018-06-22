@@ -60,6 +60,7 @@
 #include "string.h"
 #include "GPS_Parser.h"
 #include "Location.h"
+#include "Simple_distance.h"
 
 /* USER CODE END Includes */
 
@@ -84,11 +85,11 @@ uint8_t GPS_buff_pos = 0;
 int h, m, s;
 GPS_data GPS;
 __IO ITStatus UartReady = RESET;
-float distance,odo = 0.0;
+float odo1 = 0.0;
+uint32_t odo2 = 0;
+uint32_t distance = 0;
+Position Previous_Position,Current_position,P1,P2; 
 
-Position Previous_Position,Current_position; 
-//,391050500};
-//Position p2 = {514092900,391065800};
 
 
 
@@ -227,7 +228,7 @@ void StartLCD(void const * argument)
 		//sprintf(Screen_buffer, "Speed:%3d.%2d",GPS.Speed.kelometers,GPS.Speed.tenth_kelometers);
 		sprintf(Screen_buffer, "DST:%1.3f",distance);
 		u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);*/
-		rallycomp(odo, &GPS);
+		rallycomp(odo1, odo2, &GPS);
 		u8g2_SendBuffer(&u8g2);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
     osDelay(100);
@@ -240,16 +241,22 @@ void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
 	//osDelay(1000);
-	//Previous_Position.Lat=514092900;
-	//Previous_Position.Lon=391065800;
+	P1.Lat=514092900;
+	P1.Lon=391065800;
+	P2.Lat=514092800;
+	P2.Lon=391065700;
 	StartParcing();
   /* Infinite loop */
   for(;;)
   {
 		xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
-		//distance = DistanceKm(&Previous_Position,&Current_position);
-		if (GPS.status != 'V') odo = odo + DistanceKm(&Previous_Position,&Current_position);
+
+		if ((GPS.status != 'V')&& (Previous_Position.Lat != 0 )) 
+		{
+			odo1 = odo1 + DistanceKm(&Previous_Position,&Current_position);
+			odo2 = odo2 + DistanceBetween(&Previous_Position,&Current_position);
+		}
 		Previous_Position.Lat = Current_position.Lat;
 		Previous_Position.Lon = Current_position.Lon;
 		GPS_buff_pos = 0;

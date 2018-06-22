@@ -43,7 +43,7 @@ int32_t safeDLon( int32_t p2, int32_t p1 )
 
 float EquirectDistanceRadians (Position *p1, Position *p2)
 {
-	float dLat = (&p2->Lat - &p1->Lat) * RAD_PER_DEG * LOC_SCALE;
+	float dLat = (p2->Lat - p1->Lat) * RAD_PER_DEG * LOC_SCALE;
   float dLon = safeDLon( p2->Lon, p1->Lon ) * RAD_PER_DEG * LOC_SCALE;
   float x    = dLon * cos( (p1->Lat)* RAD_PER_DEG * LOC_SCALE + dLat/2 );
   return sqrt( x*x + dLat*dLat );

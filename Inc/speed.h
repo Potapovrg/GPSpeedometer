@@ -4,5 +4,5 @@
 #include "GPS_parser.h"
 
 void speedo(void);
-void rallycomp(float distance, GPS_data *GPS);
+void rallycomp(float odo1, uint32_t odo2, GPS_data *GPS);
 extern u8g2_t u8g2;

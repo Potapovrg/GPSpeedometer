@@ -51,3 +51,6 @@
 .\gpspeedometer\freertos.o: ../Inc/GPS_Parser.h
 .\gpspeedometer\freertos.o: ..\Src\NeoGPS\Location.h
 .\gpspeedometer\freertos.o: ../Inc/GPS_Parser.h
+.\gpspeedometer\freertos.o: ..\Src\Simple_distance\Simple_distance.h
+.\gpspeedometer\freertos.o: ../Inc/GPS_Parser.h
+.\gpspeedometer\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

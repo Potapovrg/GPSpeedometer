@@ -104,6 +104,7 @@
 ".\gpspeedometer\timers.o"
 ".\gpspeedometer\cmsis_os.o"
 ".\gpspeedometer\location.o"
+".\gpspeedometer\simple_distance.o"
 --library_type=microlib --strict --scatter ".\GPSpeedometer\GPSpeedometer.sct"
 --diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

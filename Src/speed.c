@@ -45,7 +45,7 @@ void distance_output(struct float_distance distance, int horisontal_position, in
 }
 
 
-void rallycomp(float distance, GPS_data *GPS){
+void rallycomp(float odo1, uint32_t odo2, GPS_data *GPS){
   u8g2_SetFontDirection(&u8g2,0);
   u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 	switch (GPS->status) {
@@ -57,12 +57,18 @@ void rallycomp(float distance, GPS_data *GPS){
 			u8g2_DrawStr(&u8g2,71,30,buf);
 		break;
 	}
-	sprintf(buf,"%02.2f",distance);
-	u8g2_DrawStr(&u8g2,60,64,buf);
+	/*sprintf(buf,"%02.2f",odo1);
+	u8g2_DrawStr(&u8g2,60,64,buf);*/
   u8g2_DrawBox(&u8g2,0,31,128,2);
   u8g2_DrawBox(&u8g2,23,0,2,64);
-  u8g2_SetFontDirection(&u8g2,3);
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+	u8g2_DrawStr(&u8g2,30,46,"Float");
+	sprintf(buf,"%02.2f",odo1);
+	u8g2_DrawStr(&u8g2,38,60,buf);
+	u8g2_DrawStr(&u8g2,90,46,"Long");
+	sprintf(buf,"%05d",odo2);
+	u8g2_DrawStr(&u8g2,80,60,buf);
+	u8g2_SetFontDirection(&u8g2,3);
   u8g2_DrawStr(&u8g2,18,28,"SPD");
   u8g2_DrawStr(&u8g2,18,60,"INT");
 	}
