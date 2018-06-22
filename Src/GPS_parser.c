@@ -16,7 +16,7 @@ char token2[BUFFSIZE];
 //$GNRMC,073810.00,A,5140.89642,N,03910.49043,E,0.260,,270218,,,A*69 NMEA string example
 //$GNVTG,,,,,,,,,N*2E
 
-void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS)
+void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS, Position *Position)
 {
 
 	int32_t first_part, second_part;
@@ -55,12 +55,12 @@ void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS)
 		sscanf(GPS_buffer+*(token_length+LATITUDE_POSITION),LATITUDE_FORMAT,&GPS->Latitude.degrees,&GPS->Latitude.minutes,&GPS->Latitude.tenth_minutes);
 		//sscanf(GPS_buffer+*(token_length+LATITUDE_POSITION),POSITION_LATITUDE_FORMAT,&GPS->Position.lat);
 		sscanf(GPS_buffer+*(token_length+LATITUDE_POSITION),"%5d.%5d",&first_part,&second_part);
-		GPS->Position.lat = first_part*100000+second_part;
+		Position->Lat = first_part*100000+second_part;
 		sscanf(GPS_buffer+*(token_length+LATITUDE_SIGN_POSITION),LATITUDE_SIGN_FORMAT,&GPS->Latitude.sign);
 		sscanf(GPS_buffer+*(token_length+LONGITUDE_POSITION),LONGITUDE_FORMAT,&GPS->Longitude.degrees,&GPS->Longitude.minutes,&GPS->Longitude.tenth_minutes);
 		//sscanf(GPS_buffer+*(token_length+LONGITUDE_POSITION),POSITION_LONGITUDE_FORMAT,&GPS->Position.lon);
 		sscanf(GPS_buffer+*(token_length+LONGITUDE_POSITION),"%5d.%5d",&first_part,&second_part);
-		GPS->Position.lon = first_part*100000+second_part;
+		Position->Lon = first_part*100000+second_part;
 		sscanf(GPS_buffer+*(token_length+LONGITUDE_SIGN_POSITION),LONGITUDE_SIGN_FORMAT,&GPS->Longitude.sign);
 		sscanf(GPS_buffer+*(token_length+DATE_POSITION),DATE_FORMAT,&GPS->Date.day,&GPS->Date.month,&GPS->Date.year);		
 	}

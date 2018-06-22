@@ -16,6 +16,7 @@
 //  along with NeoGPS.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Location.h"
+//#include "GPS_parser.h"
 
 //using namespace NeoGPS;
 
@@ -40,16 +41,16 @@ int32_t safeDLon( int32_t p2, int32_t p1 )
 } // safeDLon
 
 
-float EquirectDistanceRadians (GPS_data *p1, GPS_data *p2)
+float EquirectDistanceRadians (Position *p1, Position *p2)
 {
-	float dLat = (&p2->Position.lat - &p1->Position.lat) * RAD_PER_DEG * LOC_SCALE;
-  float dLon = safeDLon( p2->Position.lon, p1->Position.lon ) * RAD_PER_DEG * LOC_SCALE;
-  float x    = dLon * cos( (p1->Position.lat)* RAD_PER_DEG * LOC_SCALE + dLat/2 );
+	float dLat = (&p2->Lat - &p1->Lat) * RAD_PER_DEG * LOC_SCALE;
+  float dLon = safeDLon( p2->Lon, p1->Lon ) * RAD_PER_DEG * LOC_SCALE;
+  float x    = dLon * cos( (p1->Lat)* RAD_PER_DEG * LOC_SCALE + dLat/2 );
   return sqrt( x*x + dLat*dLat );
 }
 
 
-float DistanceKm(GPS_data *p1, GPS_data *p2)
+float DistanceKm(Position *p1, Position *p2)
 {
 	return EquirectDistanceRadians(p1,p2)* EARTH_RADIUS_KM;
 }

@@ -1,4 +1,5 @@
 .\gpspeedometer\speed.o: ..\Src\speed.c
+.\gpspeedometer\speed.o: ../Inc/speed.h
 .\gpspeedometer\speed.o: ../Inc/u8g2.h
 .\gpspeedometer\speed.o: ../Inc/u8x8.h
 .\gpspeedometer\speed.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
@@ -29,4 +30,5 @@
 .\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 .\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 .\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-.\gpspeedometer\speed.o: ../Inc/speed.h
+.\gpspeedometer\speed.o: ../Inc/GPS_parser.h
+.\gpspeedometer\speed.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

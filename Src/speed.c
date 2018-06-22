@@ -1,6 +1,4 @@
-#include "u8g2.h"  
-#include "u8g2_arm.h"
-#include <stdio.h>
+
 #include "speed.h"
 
 
@@ -10,7 +8,7 @@ struct float_distance
 	uint8_t ten_meteres;
 };
 
-char buf[8];
+char buf[15];
 uint32_t a=0;
 
 void speedo(void) {         
@@ -47,24 +45,25 @@ void distance_output(struct float_distance distance, int horisontal_position, in
 }
 
 
-void rallycomp(void){
-	struct float_distance interval;
-	interval.kilometers = 100;
+void rallycomp(float distance, GPS_data *GPS){
   u8g2_SetFontDirection(&u8g2,0);
   u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
-  //distance_output(total,24,30);
-  distance_output(interval,24,64);
+	switch (GPS->status) {
+		case 'V':
+			u8g2_DrawStr(&u8g2,24,30,"NO FIX");
+		break;
+		case 'A':
+			sprintf(buf,"%03d",GPS->Speed.kelometers);
+			u8g2_DrawStr(&u8g2,71,30,buf);
+		break;
+	}
+	sprintf(buf,"%02.2f",distance);
+	u8g2_DrawStr(&u8g2,60,64,buf);
   u8g2_DrawBox(&u8g2,0,31,128,2);
   u8g2_DrawBox(&u8g2,23,0,2,64);
   u8g2_SetFontDirection(&u8g2,3);
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
-  u8g2_DrawStr(&u8g2,18,28,"TOT");
+  u8g2_DrawStr(&u8g2,18,28,"SPD");
   u8g2_DrawStr(&u8g2,18,60,"INT");
-  interval.ten_meteres++;
-	if (interval.ten_meteres == 100)
-	{
-		interval.ten_meteres=0;
-		interval.kilometers++;
-	};
+	}
 	
-}

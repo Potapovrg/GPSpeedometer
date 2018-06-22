@@ -47,3 +47,5 @@
 .\gpspeedometer\main.o: ../Inc/u8x8.h
 .\gpspeedometer\main.o: ../Inc/u8g2_arm.h
 .\gpspeedometer\main.o: ../Inc/speed.h
+.\gpspeedometer\main.o: ../Inc/GPS_parser.h
+.\gpspeedometer\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

@@ -44,8 +44,10 @@
 .\gpspeedometer\freertos.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 .\gpspeedometer\freertos.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 .\gpspeedometer\freertos.o: ../Inc/speed.h
+.\gpspeedometer\freertos.o: ../Inc/GPS_parser.h
+.\gpspeedometer\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\gpspeedometer\freertos.o: ../Inc/usart.h
 .\gpspeedometer\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\gpspeedometer\freertos.o: ../Inc/GPS_Parser.h
-.\gpspeedometer\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\gpspeedometer\freertos.o: ..\Src\NeoGPS\Location.h
+.\gpspeedometer\freertos.o: ../Inc/GPS_Parser.h

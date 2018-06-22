@@ -73,8 +73,14 @@ typedef struct {
 	}Position;
 	
 }GPS_data;
+
+typedef struct {
+	int32_t Lat;
+	int32_t Lon;
+}Position;
+
 #endif
 
 //typedef enum {GNRMC,GNVTG} string_type;
 
-void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS);
+void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS, Position *Position);

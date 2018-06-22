@@ -511,6 +511,11 @@
               <FilePath>..\Src\u8g2_arm.c</FilePath>
             </File>
             <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/usart.c</FilePath>
+            </File>
+            <File>
               <FileName>speed.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\speed.c</FilePath>
@@ -519,11 +524,6 @@
               <FileName>freertos.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/usart.c</FilePath>
             </File>
             <File>
               <FileName>GPS_parser.c</FileName>
