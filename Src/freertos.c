@@ -78,17 +78,13 @@ u8g2_t u8g2;
 #define HEIGHT
 char UART_byte=0;
 char GPS_buffer[BUFFSIZE];
-char GPS_buffer1[] = "$GNRMC,073810.00,A,5140.89642,N,03910.49043,E,0.260,,270218,,,A*69";
-volatile uint8_t CPU_USAGE = 0, MAX_CPU_USAGE = 0;
 char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
-int h, m, s;
 GPS_data GPS;
 __IO ITStatus UartReady = RESET;
-float odo1 = 0.0;
+float odo1 = 0.0, odo_test = 10.32;
 uint32_t odo2 = 0;
-uint32_t distance = 0;
-Position Previous_Position,Current_position,P1,P2; 
+Position Previous_Position,Current_position; 
 
 
 
@@ -124,6 +120,29 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 		}
 	}
 }
+
+ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+	
+	switch (GPIO_Pin)
+	{
+		case GPIO_PIN_1: //2 
+			odo1 = 25.73;
+			break;
+		case GPIO_PIN_2: //1
+			odo1 = 13.24;
+			break;
+		case GPIO_PIN_3: //4
+			odo1 = 0.0;
+			break;
+		case GPIO_PIN_4: //3
+			odo1 += 1.28;
+			break;
+			
+	};
+
+} 
 /* USER CODE END FunctionPrototypes */
 
 /* Hook prototypes */
@@ -184,21 +203,11 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-	        portTickType LastTick = 0; 
-        uint16_t count = 0;                //??? ??????? ???????
-        uint16_t max_count = 0;            //???????????? ???????? ????????, ??????????? ??? ?????????? ? ????????????? 100% CPU idle
+
   for(;;)
-  {/*
-    if(xTaskGetTickCount()-LastTick > 1000)    { //???? ?????? 1000 ????? (1 ??? ??? ???? ????????)
-                        LastTick = xTaskGetTickCount();
-                        if(count > max_count) max_count = count;          //??? ??????????
-                        CPU_USAGE = 100-(100 * count / max_count);               //????????? ??????? ????????
-                        if(CPU_USAGE>MAX_CPU_USAGE) MAX_CPU_USAGE = CPU_USAGE;// ??????? ????????
-                        count = 0;                                        //???????? ???????
-                }
-                count++; */                                                 //?????????? ????????
+  {
 				osDelay(1);
-        }
+  }
 
   /* USER CODE END StartDefaultTask */
 }
@@ -206,7 +215,6 @@ void StartDefaultTask(void const * argument)
 /* StartLCD function */
 void StartLCD(void const * argument)
 {
-		float dst = 11.23;
   /* USER CODE BEGIN StartLCD */
   /* Infinite loop */
   for(;;)
@@ -228,7 +236,9 @@ void StartLCD(void const * argument)
 		//sprintf(Screen_buffer, "Speed:%3d.%2d",GPS.Speed.kelometers,GPS.Speed.tenth_kelometers);
 		sprintf(Screen_buffer, "DST:%1.3f",distance);
 		u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);*/
+		u8g2_ClearBuffer(&u8g2);
 		rallycomp(odo1, odo2, &GPS);
+		//rallycomp(odo_test, odo2, &GPS);
 		u8g2_SendBuffer(&u8g2);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
     osDelay(100);
@@ -241,10 +251,6 @@ void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
 	//osDelay(1000);
-	P1.Lat=514092900;
-	P1.Lon=391065800;
-	P2.Lat=514092800;
-	P2.Lon=391065700;
 	StartParcing();
   /* Infinite loop */
   for(;;)
@@ -255,7 +261,9 @@ void StarGPS_parser(void const * argument)
 		if ((GPS.status != 'V')&& (Previous_Position.Lat != 0 )) 
 		{
 			odo1 = odo1 + DistanceKm(&Previous_Position,&Current_position);
+			if (odo1 > 99.99) odo1 = 0;
 			odo2 = odo2 + DistanceBetween(&Previous_Position,&Current_position);
+			if (odo2 > 10000) odo2 = 0;
 		}
 		Previous_Position.Lat = Current_position.Lat;
 		Previous_Position.Lon = Current_position.Lon;

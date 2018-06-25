@@ -26,9 +26,6 @@
 #define _FORMAT
 #define _POSITION*/
 
-	/*sscanf(GPS_buffer, "$GNRMC,%2d%2d%2d.%2d,%c,%2d%2d.%5d,%c,%3d%2d.%5d,%c,%3d.%3d,%3d.%3d,%2d%2d%2d",&GPS.Time.h,&GPS.Time.m,&GPS.Time.s,&GPS.Time.ms,&GPS.status,
-			&GPS.Latitude.degrees,&GPS.Latitude.minutes,&GPS.Latitude.tenth_minutes,&GPS.Latitude.sign,&GPS.Longitude.degrees,&GPS.Longitude.minutes,&GPS.Longitude.tenth_minutes,
-			&GPS.Longitude.sign,&GPS.Speed.knots,&GPS.Speed.tenth_knots,&GPS.Course.degrees,&GPS.Course.tenth_degrees,&GPS.Date.day,&GPS.Date.month,&GPS.Date.year);*/
 			
 #ifndef GPS_DATA_STRUCT
 #define GPS_DATA_STRUCT

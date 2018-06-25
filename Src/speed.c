@@ -46,6 +46,7 @@ void distance_output(struct float_distance distance, int horisontal_position, in
 
 
 void rallycomp(float odo1, uint32_t odo2, GPS_data *GPS){
+	uint8_t shift;
   u8g2_SetFontDirection(&u8g2,0);
   u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 	switch (GPS->status) {
@@ -53,21 +54,24 @@ void rallycomp(float odo1, uint32_t odo2, GPS_data *GPS){
 			u8g2_DrawStr(&u8g2,24,30,"NO FIX");
 		break;
 		case 'A':
-			sprintf(buf,"%03d",GPS->Speed.kelometers);
+			sprintf(buf,"%3d",GPS->Speed.kelometers);
 			u8g2_DrawStr(&u8g2,71,30,buf);
 		break;
 	}
-	/*sprintf(buf,"%02.2f",odo1);
-	u8g2_DrawStr(&u8g2,60,64,buf);*/
+	sprintf(buf,"%.2f",odo1);
+	//sprintf(buf,"%3d",10);
+	if (odo1 < 10.0) shift = 19;
+	else shift = 0;
+	u8g2_DrawStr(&u8g2,43+shift,64,buf);
   u8g2_DrawBox(&u8g2,0,31,128,2);
   u8g2_DrawBox(&u8g2,23,0,2,64);
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
-	u8g2_DrawStr(&u8g2,30,46,"Float");
+	/*u8g2_DrawStr(&u8g2,30,46,"Float");
 	sprintf(buf,"%02.2f",odo1);
 	u8g2_DrawStr(&u8g2,38,60,buf);
 	u8g2_DrawStr(&u8g2,90,46,"Long");
 	sprintf(buf,"%05d",odo2);
-	u8g2_DrawStr(&u8g2,80,60,buf);
+	u8g2_DrawStr(&u8g2,80,60,buf);*/
 	u8g2_SetFontDirection(&u8g2,3);
   u8g2_DrawStr(&u8g2,18,28,"SPD");
   u8g2_DrawStr(&u8g2,18,60,"INT");
