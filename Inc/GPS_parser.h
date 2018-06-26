@@ -76,6 +76,11 @@ typedef struct {
 	int32_t Lon;
 }Position;
 
+typedef struct {
+	float odo1;
+	float odo2;
+}Race_data;
+
 #endif
 
 //typedef enum {GNRMC,GNVTG} string_type;

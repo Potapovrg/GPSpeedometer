@@ -84,11 +84,13 @@ char GPS_buffer[BUFFSIZE];
 char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
 GPS_data GPS;
+Race_data Race;
+Display Disp;
 __IO ITStatus UartReady = RESET;
 float odo1 = 0.0, odo_test = 10.32;
 uint32_t odo2 = 0;
 Position Previous_Position,Current_position; 
-
+uint8_t buttons_state, buttons_long_press_state;
 
 
 
@@ -105,16 +107,23 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 /* USER CODE BEGIN FunctionPrototypes */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
-	static portBASE_TYPE xHigherPriorityTaskWoken;
-	xHigherPriorityTaskWoken = pdFALSE;
+/*	static portBASE_TYPE xHigherPriorityTaskWoken;
+	xHigherPriorityTaskWoken = pdFALSE;*/
+	BaseType_t xYieldRequired;
 		
 	if (UartHandle->Instance == USART1)
 	{
 		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
 		if (UART_byte == 0x0A)
 		{
-			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
-			if( xHigherPriorityTaskWoken == pdTRUE ) taskYIELD();	
+//			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
+			xYieldRequired = xTaskResumeFromISR(myGPS_parserHandle);
+
+     if( xYieldRequired == pdTRUE )
+     {
+         taskYIELD();
+     }
+			//if( xHigherPriorityTaskWoken == pdTRUE ) taskYIELD();	
 		}
 		else 
 		{
@@ -127,31 +136,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 
  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-BaseType_t xYieldRequired;
-	//
-	switch (GPIO_Pin)
-	{
-		case GPIO_PIN_1: //2 
-			odo1 = 25.73;
-			break;
-		case GPIO_PIN_2: //1
-			odo1 = 13.24;
-			break;
-		case GPIO_PIN_3: //4
-			odo1 = 0.0;
-			break;
-		case GPIO_PIN_4: //3
-			//odo1 += 1.28;
+		BaseType_t xYieldRequired;
 		xYieldRequired = xTaskResumeFromISR(myButtonsHandle);
-
      if( xYieldRequired == pdTRUE )
      {
          taskYIELD();
      }
-			break;
-			
-	};
-
 } 
 /* USER CODE END FunctionPrototypes */
 
@@ -208,6 +198,7 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+	vTaskSuspend(myGPS_parserHandle);
 	vTaskSuspend(myButtonsHandle);
   /* USER CODE END RTOS_THREADS */
 
@@ -227,7 +218,7 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-
+	StartParcing();
   for(;;)
   {
 				osDelay(1);
@@ -240,29 +231,14 @@ void StartDefaultTask(void const * argument)
 void StartLCD(void const * argument)
 {
   /* USER CODE BEGIN StartLCD */
+	//uint8_t buttons_state = 0;
   /* Infinite loop */
   for(;;)
   {
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
-		//speedo();
-		/*u8g2_ClearBuffer(&u8g2);
-		u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
-		sprintf(Screen_buffer, "Time:%02d:%02d:%02d", GPS.Time.h+3,GPS.Time.m,GPS.Time.s);
-		u8g2_DrawStr(&u8g2,0,10,Screen_buffer);
-		sprintf(Screen_buffer, "%02d.%02d.%4d", GPS.Date.day,GPS.Date.month,GPS.Date.year+2000);
-		u8g2_DrawStr(&u8g2,0,20+OFFSET,Screen_buffer);
-		sprintf(Screen_buffer, "%02d %02d.%03d %c", GPS.Latitude.degrees,GPS.Latitude.minutes,GPS.Latitude.tenth_minutes,GPS.Latitude.sign);
-		u8g2_DrawStr(&u8g2,0,30+2*OFFSET,Screen_buffer);
-		sprintf(Screen_buffer, "%2d %02d.%03d %c", GPS.Longitude.degrees,GPS.Longitude.minutes,GPS.Longitude.tenth_minutes,GPS.Longitude.sign);
-		u8g2_DrawStr(&u8g2,0,40+3*OFFSET,Screen_buffer);
-		sprintf(Screen_buffer, "Status:%c", GPS.status);
-		u8g2_DrawStr(&u8g2,0,50+4*OFFSET,Screen_buffer);
-		//sprintf(Screen_buffer, "Speed:%3d.%2d",GPS.Speed.kelometers,GPS.Speed.tenth_kelometers);
-		sprintf(Screen_buffer, "DST:%1.3f",distance);
-		u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);*/
+		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
 		u8g2_ClearBuffer(&u8g2);
-		rallycomp(odo1, odo2, &GPS);
-		//rallycomp(odo_test, odo2, &GPS);
+		rallycomp(&GPS, &Race, &Disp, buttons_state);
 		u8g2_SendBuffer(&u8g2);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
     osDelay(100);
@@ -274,28 +250,28 @@ void StartLCD(void const * argument)
 void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
-	//osDelay(1000);
-	StartParcing();
+	float Dist;
   /* Infinite loop */
   for(;;)
   {
-		xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
+		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
 
 		if ((GPS.status != 'V')&& (Previous_Position.Lat != 0 )) 
 		{
-			odo1 = odo1 + DistanceKm(&Previous_Position,&Current_position);
-			if (odo1 > 99.99) odo1 = 0;
-			odo2 = odo2 + DistanceBetween(&Previous_Position,&Current_position);
-			if (odo2 > 10000) odo2 = 0;
+			Dist = DistanceKm(&Previous_Position,&Current_position);
+			Race.odo1 += Dist;
+			Race.odo2 += Dist;
+			if (Race.odo1 > 99.99) Race.odo1 = 0;
+			Previous_Position.Lat = Current_position.Lat;
+			Previous_Position.Lon = Current_position.Lon;
 		}
-		Previous_Position.Lat = Current_position.Lat;
-		Previous_Position.Lon = Current_position.Lon;
 		GPS_buff_pos = 0;
-		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
-		//GPS.Speed.kelometers = 100;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
+		//xSemaphoreGive(myBinarySemUART_ISRHandle);
+		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+		vTaskSuspend(myGPS_parserHandle);
     osDelay(1);
   }
 	
@@ -309,10 +285,36 @@ void StartButtons(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		osDelay(1);
-		if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_4))odo1+=1.0;
+		osDelay(10);
+		if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_2))
+			buttons_state |= (1 << 0);
+    else
+      buttons_state &= ~(1 << 0);
+		if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_1))
+			buttons_state |= (1 << 1);
+    else
+      buttons_state &= ~(1 << 1);
+		if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_4))
+			buttons_state |= (1 << 2);
+    else
+			buttons_state &= ~(1 << 2);
+			if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3))
+			buttons_state |= (1 << 3);
+    else
+			buttons_state &= ~(1 << 3);
+		
+			if (buttons_state & 1<<1){
+				Disp.pos2++;
+				if (Disp.pos2>2) Disp.pos2 = 0; 
+			}
+			if (buttons_state & 1<<2)
+				Race.odo1 += 1.0;
+			if (buttons_state & 1<<3)
+				Race.odo1 = 0;
+		xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
+		osDelay(10);
 		vTaskSuspend(myButtonsHandle);
-    osDelay(1);
+
   }
   /* USER CODE END StartButtons */
 }

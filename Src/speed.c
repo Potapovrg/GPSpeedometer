@@ -45,11 +45,26 @@ void distance_output(struct float_distance distance, int horisontal_position, in
 }
 
 
-void rallycomp(float odo1, uint32_t odo2, GPS_data *GPS){
+void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state){
 	uint8_t shift;
+	
   u8g2_SetFontDirection(&u8g2,0);
   u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
-	switch (GPS->status) {
+
+	sprintf(buf,"%.2f",Race->odo1);
+	if (Race->odo1 < 10.0) shift = 19;
+	else shift = 0;
+	u8g2_DrawStr(&u8g2,43+shift,64,buf);
+
+	switch (Disp->pos2){
+		case 0:
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_SetFontDirection(&u8g2,3);
+			u8g2_DrawStr(&u8g2,14,28,"SPD");
+		
+			u8g2_SetFontDirection(&u8g2,0);
+			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
+		switch (GPS->status) {
 		case 'V':
 			u8g2_DrawStr(&u8g2,24,30,"NO FIX");
 		break;
@@ -57,23 +72,61 @@ void rallycomp(float odo1, uint32_t odo2, GPS_data *GPS){
 			sprintf(buf,"%3d",GPS->Speed.kelometers);
 			u8g2_DrawStr(&u8g2,71,30,buf);
 		break;
+		}
+		break;
+		case 1:
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_SetFontDirection(&u8g2,3);
+			u8g2_DrawStr(&u8g2,14,24,"TM");
+		
+			u8g2_SetFontDirection(&u8g2,0);
+			u8g2_SetFont(&u8g2,u8g2_font_logisoso22_tr);
+			sprintf(buf,"%02d:%02d:%02d", GPS->Time.h+3,GPS->Time.m,GPS->Time.s);
+			u8g2_DrawStr(&u8g2,20,27,buf);
+		break;
+		case 2:
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_SetFontDirection(&u8g2,3);
+			u8g2_DrawStr(&u8g2,14,28,"OD2");
+			
+			u8g2_SetFontDirection(&u8g2,0);
+			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
+			sprintf(buf,"%.2f",Race->odo2);
+			if (Race->odo2 < 10.0) shift = 19;
+			else shift = 0;
+			u8g2_DrawStr(&u8g2,43+shift,30,buf);
+			break;
 	}
-	sprintf(buf,"%.2f",odo1);
-	//sprintf(buf,"%3d",10);
-	if (odo1 < 10.0) shift = 19;
-	else shift = 0;
-	u8g2_DrawStr(&u8g2,43+shift,64,buf);
+	
   u8g2_DrawBox(&u8g2,0,31,128,2);
-  u8g2_DrawBox(&u8g2,23,0,2,64);
-  u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+  u8g2_DrawBox(&u8g2,18,0,2,64);
 	/*u8g2_DrawStr(&u8g2,30,46,"Float");
 	sprintf(buf,"%02.2f",odo1);
 	u8g2_DrawStr(&u8g2,38,60,buf);
 	u8g2_DrawStr(&u8g2,90,46,"Long");
 	sprintf(buf,"%05d",odo2);
 	u8g2_DrawStr(&u8g2,80,60,buf);*/
+	
+	u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 	u8g2_SetFontDirection(&u8g2,3);
-  u8g2_DrawStr(&u8g2,18,28,"SPD");
-  u8g2_DrawStr(&u8g2,18,60,"INT");
+  //u8g2_DrawStr(&u8g2,18,28,"SPD");
+	//u8g2_DrawStr(&u8g2,14,24,"TM");
+  u8g2_DrawStr(&u8g2,14,60,"OD1");
 	}
 	
+		//speedo();
+		/*u8g2_ClearBuffer(&u8g2);
+		u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+		sprintf(Screen_buffer, "Time:%02d:%02d:%02d", GPS.Time.h+3,GPS.Time.m,GPS.Time.s);
+		u8g2_DrawStr(&u8g2,0,10,Screen_buffer);
+		sprintf(Screen_buffer, "%02d.%02d.%4d", GPS.Date.day,GPS.Date.month,GPS.Date.year+2000);
+		u8g2_DrawStr(&u8g2,0,20+OFFSET,Screen_buffer);
+		sprintf(Screen_buffer, "%02d %02d.%03d %c", GPS.Latitude.degrees,GPS.Latitude.minutes,GPS.Latitude.tenth_minutes,GPS.Latitude.sign);
+		u8g2_DrawStr(&u8g2,0,30+2*OFFSET,Screen_buffer);
+		sprintf(Screen_buffer, "%2d %02d.%03d %c", GPS.Longitude.degrees,GPS.Longitude.minutes,GPS.Longitude.tenth_minutes,GPS.Longitude.sign);
+		u8g2_DrawStr(&u8g2,0,40+3*OFFSET,Screen_buffer);
+		sprintf(Screen_buffer, "Status:%c", GPS.status);
+		u8g2_DrawStr(&u8g2,0,50+4*OFFSET,Screen_buffer);
+		//sprintf(Screen_buffer, "Speed:%3d.%2d",GPS.Speed.kelometers,GPS.Speed.tenth_kelometers);
+		sprintf(Screen_buffer, "DST:%1.3f",distance);
+		u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);*/
