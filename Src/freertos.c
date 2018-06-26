@@ -68,8 +68,11 @@
 osThreadId defaultTaskHandle;
 osThreadId myLCDHandle;
 osThreadId myGPS_parserHandle;
+osThreadId myButtonsHandle;
+osMessageQId myButtons_state_QueueHandle;
 osSemaphoreId myBinarySemUART_ISRHandle;
 osSemaphoreId myBinarySemDisplay_DataHandle;
+osSemaphoreId myBinarySemButtons_ISRHandle;
 
 /* USER CODE BEGIN Variables */
 u8g2_t u8g2;
@@ -95,6 +98,7 @@ Position Previous_Position,Current_position;
 void StartDefaultTask(void const * argument);
 void StartLCD(void const * argument);
 void StarGPS_parser(void const * argument);
+void StartButtons(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -123,8 +127,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 
  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-
-	
+BaseType_t xYieldRequired;
+	//
 	switch (GPIO_Pin)
 	{
 		case GPIO_PIN_1: //2 
@@ -137,7 +141,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 			odo1 = 0.0;
 			break;
 		case GPIO_PIN_4: //3
-			odo1 += 1.28;
+			//odo1 += 1.28;
+		xYieldRequired = xTaskResumeFromISR(myButtonsHandle);
+
+     if( xYieldRequired == pdTRUE )
+     {
+         taskYIELD();
+     }
 			break;
 			
 	};
@@ -167,6 +177,10 @@ void MX_FREERTOS_Init(void) {
   osSemaphoreDef(myBinarySemDisplay_Data);
   myBinarySemDisplay_DataHandle = osSemaphoreCreate(osSemaphore(myBinarySemDisplay_Data), 1);
 
+  /* definition and creation of myBinarySemButtons_ISR */
+  osSemaphoreDef(myBinarySemButtons_ISR);
+  myBinarySemButtons_ISRHandle = osSemaphoreCreate(osSemaphore(myBinarySemButtons_ISR), 1);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -188,9 +202,19 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(myGPS_parser, StarGPS_parser, osPriorityNormal, 0, 128);
   myGPS_parserHandle = osThreadCreate(osThread(myGPS_parser), NULL);
 
+  /* definition and creation of myButtons */
+  osThreadDef(myButtons, StartButtons, osPriorityIdle, 0, 128);
+  myButtonsHandle = osThreadCreate(osThread(myButtons), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+	vTaskSuspend(myButtonsHandle);
   /* USER CODE END RTOS_THREADS */
+
+  /* Create the queue(s) */
+  /* definition and creation of myButtons_state_Queue */
+  osMessageQDef(myButtons_state_Queue, 8, uint8_t);
+  myButtons_state_QueueHandle = osMessageCreate(osMessageQ(myButtons_state_Queue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -256,6 +280,7 @@ void StarGPS_parser(void const * argument)
   for(;;)
   {
 		xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
+		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
 
 		if ((GPS.status != 'V')&& (Previous_Position.Lat != 0 )) 
@@ -275,6 +300,21 @@ void StarGPS_parser(void const * argument)
   }
 	
   /* USER CODE END StarGPS_parser */
+}
+
+/* StartButtons function */
+void StartButtons(void const * argument)
+{
+  /* USER CODE BEGIN StartButtons */
+  /* Infinite loop */
+  for(;;)
+  {
+		osDelay(1);
+		if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_4))odo1+=1.0;
+		vTaskSuspend(myButtonsHandle);
+    osDelay(1);
+  }
+  /* USER CODE END StartButtons */
 }
 
 /* USER CODE BEGIN Application */

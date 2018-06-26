@@ -29,6 +29,8 @@
 .\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 .\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 .\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
+.\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
+.\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 .\gpspeedometer\speed.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 .\gpspeedometer\speed.o: ../Inc/GPS_parser.h
 .\gpspeedometer\speed.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

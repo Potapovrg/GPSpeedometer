@@ -26,6 +26,7 @@
 ".\gpspeedometer\speed.o"
 ".\gpspeedometer\freertos.o"
 ".\gpspeedometer\gps_parser.o"
+".\gpspeedometer\stm32f1xx_hal_timebase_tim.o"
 ".\gpspeedometer\u8g2_bitmap.o"
 ".\gpspeedometer\u8g2_box.o"
 ".\gpspeedometer\u8g2_buffer.o"
