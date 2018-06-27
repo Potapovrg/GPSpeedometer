@@ -87,8 +87,6 @@ GPS_data GPS;
 Race_data Race;
 Display Disp;
 __IO ITStatus UartReady = RESET;
-float odo1 = 0.0, odo_test = 10.32;
-uint32_t odo2 = 0;
 Position Previous_Position,Current_position; 
 uint8_t buttons_state, buttons_long_press_state;
 
@@ -257,13 +255,16 @@ void StarGPS_parser(void const * argument)
 		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
-
-		if ((GPS.status != 'V')&& (Previous_Position.Lat != 0 )) 
+		if (GPS.status != 'V')	
 		{
-			Dist = DistanceKm(&Previous_Position,&Current_position);
-			Race.odo1 += Dist;
-			Race.odo2 += Dist;
-			if (Race.odo1 > 99.99) Race.odo1 = 0;
+			if (Previous_Position.Lat != 0)
+			{
+				Dist = DistanceKm(&Previous_Position,&Current_position);
+			//Dist = 1.0;
+				Race.odo1 += Dist;
+				Race.odo2 += Dist;
+				if (Race.odo1 > 99.99) Race.odo1 = 0;
+			}
 			Previous_Position.Lat = Current_position.Lat;
 			Previous_Position.Lon = Current_position.Lon;
 		}
