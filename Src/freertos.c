@@ -259,7 +259,8 @@ void StarGPS_parser(void const * argument)
 		{
 			if (Previous_Position.Lat != 0)
 			{
-				Dist = DistanceKm(&Previous_Position,&Current_position);
+				//Dist = DistanceKm(&Previous_Position,&Current_position);
+				Dist = DistanceBetween(&Previous_Position,&Current_position);
 			//Dist = 1.0;
 				Race.odo1 += Dist;
 				Race.odo2 += Dist;

@@ -53,8 +53,9 @@ float EquirectDistanceRadians (Position *p1, Position *p2)
 float DistanceKm(Position *p1, Position *p2)
 {
 	float result = EquirectDistanceRadians(p1,p2)* EARTH_RADIUS_KM;
-	if ((result<0.0005)||(result>0.1)) return 0;
-	else return result;
+	/*if ((result<0.0005)||(result>0.1)) return 0;
+	else return result;*/
+	return result;
 }
 
 
