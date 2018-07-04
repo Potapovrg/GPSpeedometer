@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\GPSpeedometer\GPSpeedometer.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\GPSpeedometer\GPSpeedometer.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Jul 03 16:08:01 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed Jul 04 15:22:53 2018
 <BR><P>
 <H3>Maximum Stack Usage =        272 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -338,8 +338,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_round
 <LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartButtons
-<LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StarGPS_parser
+<BR>[Called By]<UL><LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StarGPS_parser
 <LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_frsub
 <LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fsub
 </UL>
@@ -944,7 +943,7 @@ Global Symbols
 <P><STRONG><a name="[1]"></a>NMI_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f1xx_it.o(i.NMI_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f103xb.o(RESET)
 </UL>
-<P><STRONG><a name="[ae]"></a>Parce_NMEA_string</STRONG> (Thumb, 328 bytes, Stack size 40 bytes, gps_parser.o(i.Parce_NMEA_string))
+<P><STRONG><a name="[ae]"></a>Parce_NMEA_string</STRONG> (Thumb, 334 bytes, Stack size 40 bytes, gps_parser.o(i.Parce_NMEA_string))
 <BR><BR>[Stack]<UL><LI>Max Depth = 256<LI>Call Chain = Parce_NMEA_string &rArr; __0sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_string
 </UL>
 <BR>[Calls]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strncmp
@@ -953,7 +952,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StarGPS_parser
 </UL>
 
-<P><STRONG><a name="[4a]"></a>StarGPS_parser</STRONG> (Thumb, 166 bytes, Stack size 0 bytes, freertos.o(i.StarGPS_parser))
+<P><STRONG><a name="[4a]"></a>StarGPS_parser</STRONG> (Thumb, 178 bytes, Stack size 0 bytes, freertos.o(i.StarGPS_parser))
 <BR><BR>[Stack]<UL><LI>Max Depth = 256<LI>Call Chain = StarGPS_parser &rArr; Parce_NMEA_string &rArr; __0sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_string
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
@@ -968,14 +967,13 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(.constdata)
 </UL>
-<P><STRONG><a name="[4b]"></a>StartButtons</STRONG> (Thumb, 206 bytes, Stack size 0 bytes, freertos.o(i.StartButtons))
+<P><STRONG><a name="[4b]"></a>StartButtons</STRONG> (Thumb, 192 bytes, Stack size 0 bytes, freertos.o(i.StartButtons))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = StartButtons &rArr; xQueueGenericSend &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_ReadPin
 <LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
 <LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskSuspend
 <LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
-<LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(.constdata)
 </UL>
@@ -987,8 +985,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(.constdata)
 </UL>
-<P><STRONG><a name="[49]"></a>StartLCD</STRONG> (Thumb, 66 bytes, Stack size 0 bytes, freertos.o(i.StartLCD))
-<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = StartLCD &rArr; rallycomp &rArr; u8g2_DrawStr &rArr; u8g2_draw_string &rArr; u8g2_DrawGlyph &rArr; u8g2_font_decode_glyph &rArr; u8g2_font_decode_len &rArr; u8g2_DrawHVLine
+<P><STRONG><a name="[49]"></a>StartLCD</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, freertos.o(i.StartLCD))
+<BR><BR>[Stack]<UL><LI>Max Depth = 216<LI>Call Chain = StartLCD &rArr; rallycomp &rArr; u8g2_DrawStr &rArr; u8g2_draw_string &rArr; u8g2_DrawGlyph &rArr; u8g2_font_decode_glyph &rArr; u8g2_font_decode_len &rArr; u8g2_DrawHVLine
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericReceive
@@ -1173,8 +1171,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvInitialiseNewTask
 </UL>
 
-<P><STRONG><a name="[b5]"></a>rallycomp</STRONG> (Thumb, 388 bytes, Stack size 24 bytes, speed.o(i.rallycomp))
-<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = rallycomp &rArr; u8g2_DrawStr &rArr; u8g2_draw_string &rArr; u8g2_DrawGlyph &rArr; u8g2_font_decode_glyph &rArr; u8g2_font_decode_len &rArr; u8g2_DrawHVLine
+<P><STRONG><a name="[b5]"></a>rallycomp</STRONG> (Thumb, 482 bytes, Stack size 32 bytes, speed.o(i.rallycomp))
+<BR><BR>[Stack]<UL><LI>Max Depth = 208<LI>Call Chain = rallycomp &rArr; u8g2_DrawStr &rArr; u8g2_draw_string &rArr; u8g2_DrawGlyph &rArr; u8g2_font_decode_glyph &rArr; u8g2_font_decode_len &rArr; u8g2_DrawHVLine
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;u8g2_SetFontDirection
 <LI><a href="#[ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;u8g2_SetFont

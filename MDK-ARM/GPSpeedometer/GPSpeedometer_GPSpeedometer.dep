@@ -541,8 +541,8 @@ I (../Inc/gpio.h)(0x5B33736F)
 I (../Inc/u8g2.h)(0x59B12AE7)
 I (../Inc/u8x8.h)(0x59AE4F43)
 I (../Inc/u8g2_arm.h)(0x5A8D6F8C)
-I (../Inc/speed.h)(0x5B321C0C)
-I (../Inc/GPS_parser.h)(0x5B3219C8)
+I (../Inc/speed.h)(0x5B3C8543)
+I (../Inc/GPS_parser.h)(0x5B3C8386)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588BC994)
 F (../Src/gpio.c)(0x5B33736F)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\gpio.o --omf_browse .\gpspeedometer\gpio.crf --depend .\gpspeedometer\gpio.d)
 I (../Inc/gpio.h)(0x5B33736F)
@@ -693,8 +693,8 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x59B0D5A3)
 I (../Inc/gpio.h)(0x5B33736F)
-F (..\Src\speed.c)(0x5B32201B)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\speed.o --omf_browse .\gpspeedometer\speed.crf --depend .\gpspeedometer\speed.d)
-I (../Inc/speed.h)(0x5B321C0C)
+F (..\Src\speed.c)(0x5B3C87CA)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\speed.o --omf_browse .\gpspeedometer\speed.crf --depend .\gpspeedometer\speed.d)
+I (../Inc/speed.h)(0x5B3C8543)
 I (../Inc/u8g2.h)(0x59B12AE7)
 I (../Inc/u8x8.h)(0x59AE4F43)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588BC994)
@@ -726,9 +726,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x59B0D5A3)
-I (../Inc/GPS_parser.h)(0x5B3219C8)
+I (../Inc/GPS_parser.h)(0x5B3C8386)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588BC994)
-F (../Src/freertos.c)(0x5B3B746E)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\freertos.o --omf_browse .\gpspeedometer\freertos.crf --depend .\gpspeedometer\freertos.d)
+F (../Src/freertos.c)(0x5B3CB859)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\freertos.o --omf_browse .\gpspeedometer\freertos.crf --depend .\gpspeedometer\freertos.d)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x59B0D5A4)
 I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x588BC994)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588BC994)
@@ -774,16 +774,16 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x59B0D5A3)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x59B0D5A3)
-I (../Inc/speed.h)(0x5B321C0C)
-I (../Inc/GPS_parser.h)(0x5B3219C8)
+I (../Inc/speed.h)(0x5B3C8543)
+I (../Inc/GPS_parser.h)(0x5B3C8386)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588BC994)
 I (../Inc/usart.h)(0x5B337371)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x588BC994)
 I (..\Src\NeoGPS\Location.h)(0x5B3B727A)
 I (..\Src\Simple_distance\Simple_distance.h)(0x5B2CD0F8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x588BC994)
-F (..\Src\GPS_parser.c)(0x5B2B946D)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\gps_parser.o --omf_browse .\gpspeedometer\gps_parser.crf --depend .\gpspeedometer\gps_parser.d)
-I (../Inc/GPS_parser.h)(0x5B3219C8)
+F (..\Src\GPS_parser.c)(0x5B3CBC1A)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\gps_parser.o --omf_browse .\gpspeedometer\gps_parser.crf --depend .\gpspeedometer\gps_parser.d)
+I (../Inc/GPS_parser.h)(0x5B3C8386)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x588BC994)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588BC994)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588BC994)
@@ -1247,15 +1247,15 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h)(0x59B0D5A4)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h)(0x59B0D5A4)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x59B0D5A4)
 I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x59B0D5A2)
-F (..\Src\NeoGPS\Location.c)(0x5B3B735B)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\location.o --omf_browse .\gpspeedometer\location.crf --depend .\gpspeedometer\location.d)
+F (..\Src\NeoGPS\Location.c)(0x5B3C8305)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\location.o --omf_browse .\gpspeedometer\location.crf --depend .\gpspeedometer\location.d)
 I (..\Src\NeoGPS\Location.h)(0x5B3B727A)
-I (../Inc/GPS_Parser.h)(0x5B3219C8)
+I (../Inc/GPS_Parser.h)(0x5B3C8386)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x588BC994)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588BC994)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588BC994)
 F (..\Src\Simple_distance\Simple_distance.c)(0x5B3B7482)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3 -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ..\Src\NeoGPS -I ..\Src\Simple_distance --C99 -D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o .\gpspeedometer\simple_distance.o --omf_browse .\gpspeedometer\simple_distance.crf --depend .\gpspeedometer\simple_distance.d)
 I (..\Src\Simple_distance\Simple_distance.h)(0x5B2CD0F8)
-I (../Inc/GPS_Parser.h)(0x5B3219C8)
+I (../Inc/GPS_Parser.h)(0x5B3C8386)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x588BC994)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588BC994)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588BC994)

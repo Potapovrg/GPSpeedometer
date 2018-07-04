@@ -45,7 +45,7 @@ void distance_output(struct float_distance distance, int horisontal_position, in
 }
 
 
-void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state){
+void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state){
 	uint8_t shift;
 	
   u8g2_SetFontDirection(&u8g2,0);
@@ -88,7 +88,6 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_st
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 			u8g2_SetFontDirection(&u8g2,3);
 			u8g2_DrawStr(&u8g2,14,28,"OD2");
-			
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 			sprintf(buf,"%.2f",Race->odo2);
@@ -96,6 +95,17 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_st
 			else shift = 0;
 			u8g2_DrawStr(&u8g2,43+shift,30,buf);
 			break;
+		case 3:
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_SetFontDirection(&u8g2,3);
+			u8g2_DrawStr(&u8g2,14,28,"LOC");
+			u8g2_SetFontDirection(&u8g2,0);
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			sprintf(buf,"%010d",Pos->Lat);
+			u8g2_DrawStr(&u8g2,38,14,buf);
+			sprintf(buf,"%010d",Pos->Lon);
+			u8g2_DrawStr(&u8g2,38,28,buf);
+		break;
 	}
 	
   u8g2_DrawBox(&u8g2,0,31,128,2);

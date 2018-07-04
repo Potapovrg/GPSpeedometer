@@ -10,6 +10,7 @@ typedef struct {
 
 
 void speedo(void);
-void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);
+//void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);
+void rallycomp(Position *Pos,GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);
 extern u8g2_t u8g2;
 

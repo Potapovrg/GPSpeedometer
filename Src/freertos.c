@@ -92,6 +92,7 @@ uint8_t buttons_state, buttons_long_press_state;
 
 
 
+
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -236,7 +237,7 @@ void StartLCD(void const * argument)
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
 		u8g2_ClearBuffer(&u8g2);
-		rallycomp(&GPS, &Race, &Disp, buttons_state);
+		rallycomp(&Current_position,&GPS, &Race, &Disp, buttons_state);
 		u8g2_SendBuffer(&u8g2);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
     osDelay(100);
@@ -249,6 +250,11 @@ void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
 	float Dist;
+	Race.odo2 = 10;
+	Previous_Position.Lat = 0;
+	Current_position.Lat = 0;
+	Previous_Position.Lon = 0;
+	Current_position.Lon = 0;
   /* Infinite loop */
   for(;;)
   {
@@ -262,9 +268,12 @@ void StarGPS_parser(void const * argument)
 				//Dist = DistanceKm(&Previous_Position,&Current_position);
 				Dist = DistanceBetween(&Previous_Position,&Current_position);
 			//Dist = 1.0;
+				if (Dist < 0.2)
+				{					
 				Race.odo1 += Dist;
 				Race.odo2 += Dist;
-				if (Race.odo1 > 99.99) Race.odo1 = 0;
+				}
+				//if (Race.odo1 > 99.99) Race.odo1 = 0;
 			}
 			Previous_Position.Lat = Current_position.Lat;
 			Previous_Position.Lon = Current_position.Lon;
@@ -307,10 +316,10 @@ void StartButtons(void const * argument)
 		
 			if (buttons_state & 1<<1){
 				Disp.pos2++;
-				if (Disp.pos2>2) Disp.pos2 = 0; 
+				if (Disp.pos2>3) Disp.pos2 = 0; 
 			}
 			if (buttons_state & 1<<2)
-				Race.odo1 += 1.0;
+				Race.odo2 = 0;
 			if (buttons_state & 1<<3)
 				Race.odo1 = 0;
 		xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
