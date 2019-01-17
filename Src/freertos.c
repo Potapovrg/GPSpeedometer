@@ -101,14 +101,16 @@ __IO ITStatus UartReady = RESET;
 Position Previous_Position,Current_position; 
 uint8_t buttons_state, buttons_long_press_state;
 
-float af = 10.1;
-float bf = 0;
+float af = 5.7;
+float bf = 3.2;
 
 uint8_t xBuffer[1];
 uint8_t yBuffer[1]; 
 #define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */
  
-#define MEMORY_ADDRESS                                                    0x0
+#define MEMORY_ADDRESS                                                    0x00
+#define ODO1_ADDRESS 0x00
+#define ODO2_ADDRESS 0x04
 
 
 /* USER CODE END Variables */
@@ -301,8 +303,14 @@ void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
 	float Dist;
-	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5); //read memory address 08
-	Race.odo2 = 10;
+	/*HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&af, 4, 5);
+	osDelay(10);
+	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&bf, 4, 5);
+	osDelay(10);*/
+	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);
+  HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
+	//read memory address 08
+	//Race.odo2 = 10;
 	Previous_Position.Lat = 0;
 	Current_position.Lat = 0;
 	Previous_Position.Lon = 0;
@@ -323,8 +331,9 @@ void StarGPS_parser(void const * argument)
 				if (Dist < 0.2)
 				{					
 				Race.odo1 += Dist;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);	//write to memory address 08
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);
 				Race.odo2 += Dist;
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
 				}
 				//if (Race.odo1 > 99.99) Race.odo1 = 0;
 			}
@@ -378,11 +387,14 @@ void StartButtons(void const * argument)
 				if (Disp.pos2>3) Disp.pos2 = 0; 
 			}
 			if (buttons_state & 1<<2)
+			{
 				Race.odo2 = 0;
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
+			}
 			if (buttons_state & 1<<3)
 			{
 				Race.odo1 = 0;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);	//write to memory address 08
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);	//write to memory address 08
 			}
 		xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
 		osDelay(10);
