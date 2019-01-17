@@ -5,7 +5,6 @@
 .\gpspeedometer\queue.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\gpspeedometer\queue.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\gpspeedometer\queue.o: ../Inc/FreeRTOSConfig.h
-.\gpspeedometer\queue.o: ../Inc/main.h
 .\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 .\gpspeedometer\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

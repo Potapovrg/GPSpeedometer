@@ -4,7 +4,6 @@
 .\gpspeedometer\event_groups.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\gpspeedometer\event_groups.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\gpspeedometer\event_groups.o: ../Inc/FreeRTOSConfig.h
-.\gpspeedometer\event_groups.o: ../Inc/main.h
 .\gpspeedometer\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\gpspeedometer\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 .\gpspeedometer\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

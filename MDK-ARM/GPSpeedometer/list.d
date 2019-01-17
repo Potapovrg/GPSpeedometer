@@ -4,7 +4,6 @@
 .\gpspeedometer\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\gpspeedometer\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\gpspeedometer\list.o: ../Inc/FreeRTOSConfig.h
-.\gpspeedometer\list.o: ../Inc/main.h
 .\gpspeedometer\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\gpspeedometer\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 .\gpspeedometer\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

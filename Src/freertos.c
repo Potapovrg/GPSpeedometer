@@ -1,3 +1,4 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : freertos.c
@@ -9,7 +10,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
+  * Copyright (c) 2019 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -45,18 +46,22 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "main.h"
 #include "cmsis_os.h"
 
+/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
 #include "u8g2.h"  
 #include "u8g2_arm.h"
 #include <stdio.h>
 #include "speed.h"
 #include "usart.h"
+#include "i2c.h"
 #include "string.h"
 #include "GPS_Parser.h"
 #include "Location.h"
@@ -64,16 +69,22 @@
 
 /* USER CODE END Includes */
 
-/* Variables -----------------------------------------------------------------*/
-osThreadId defaultTaskHandle;
-osThreadId myLCDHandle;
-osThreadId myGPS_parserHandle;
-osThreadId myButtonsHandle;
-osMessageQId myButtons_state_QueueHandle;
-osSemaphoreId myBinarySemUART_ISRHandle;
-osSemaphoreId myBinarySemDisplay_DataHandle;
-osSemaphoreId myBinarySemButtons_ISRHandle;
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 u8g2_t u8g2;
 #define StartParcing() HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1)
@@ -90,19 +101,28 @@ __IO ITStatus UartReady = RESET;
 Position Previous_Position,Current_position; 
 uint8_t buttons_state, buttons_long_press_state;
 
+float af = 10.1;
+float bf = 0;
 
+uint8_t xBuffer[1];
+uint8_t yBuffer[1]; 
+#define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */
+ 
+#define MEMORY_ADDRESS                                                    0x0
 
 
 /* USER CODE END Variables */
+osThreadId defaultTaskHandle;
+osThreadId myLCDHandle;
+osThreadId myGPS_parserHandle;
+osThreadId myButtonsHandle;
+osThreadId myEEPROMHandle;
+osMessageQId myButtons_state_QueueHandle;
+osSemaphoreId myBinarySemUART_ISRHandle;
+osSemaphoreId myBinarySemDisplay_DataHandle;
+osSemaphoreId myBinarySemButtons_ISRHandle;
 
-/* Function prototypes -------------------------------------------------------*/
-void StartDefaultTask(void const * argument);
-void StartLCD(void const * argument);
-void StarGPS_parser(void const * argument);
-void StartButtons(void const * argument);
-
-void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
-
+/* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
@@ -144,10 +164,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 } 
 /* USER CODE END FunctionPrototypes */
 
-/* Hook prototypes */
+void StartDefaultTask(void const * argument);
+void StartLCD(void const * argument);
+void StarGPS_parser(void const * argument);
+void StartButtons(void const * argument);
+void StartTask05(void const * argument);
 
-/* Init FreeRTOS */
+void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
+/**
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
        
@@ -195,6 +224,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(myButtons, StartButtons, osPriorityIdle, 0, 128);
   myButtonsHandle = osThreadCreate(osThread(myButtons), NULL);
 
+  /* definition and creation of myEEPROM */
+  osThreadDef(myEEPROM, StartTask05, osPriorityIdle, 0, 128);
+  myEEPROMHandle = osThreadCreate(osThread(myEEPROM), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 	vTaskSuspend(myGPS_parserHandle);
@@ -211,7 +244,13 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 }
 
-/* StartDefaultTask function */
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used 
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
 
@@ -226,7 +265,13 @@ void StartDefaultTask(void const * argument)
   /* USER CODE END StartDefaultTask */
 }
 
-/* StartLCD function */
+/* USER CODE BEGIN Header_StartLCD */
+/**
+* @brief Function implementing the myLCD thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLCD */
 void StartLCD(void const * argument)
 {
   /* USER CODE BEGIN StartLCD */
@@ -245,11 +290,18 @@ void StartLCD(void const * argument)
   /* USER CODE END StartLCD */
 }
 
-/* StarGPS_parser function */
+/* USER CODE BEGIN Header_StarGPS_parser */
+/**
+* @brief Function implementing the myGPS_parser thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StarGPS_parser */
 void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
 	float Dist;
+	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5); //read memory address 08
 	Race.odo2 = 10;
 	Previous_Position.Lat = 0;
 	Current_position.Lat = 0;
@@ -271,6 +323,7 @@ void StarGPS_parser(void const * argument)
 				if (Dist < 0.2)
 				{					
 				Race.odo1 += Dist;
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);	//write to memory address 08
 				Race.odo2 += Dist;
 				}
 				//if (Race.odo1 > 99.99) Race.odo1 = 0;
@@ -289,7 +342,13 @@ void StarGPS_parser(void const * argument)
   /* USER CODE END StarGPS_parser */
 }
 
-/* StartButtons function */
+/* USER CODE BEGIN Header_StartButtons */
+/**
+* @brief Function implementing the myButtons thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartButtons */
 void StartButtons(void const * argument)
 {
   /* USER CODE BEGIN StartButtons */
@@ -321,7 +380,10 @@ void StartButtons(void const * argument)
 			if (buttons_state & 1<<2)
 				Race.odo2 = 0;
 			if (buttons_state & 1<<3)
+			{
 				Race.odo1 = 0;
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);	//write to memory address 08
+			}
 		xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
 		osDelay(10);
 		vTaskSuspend(myButtonsHandle);
@@ -330,6 +392,32 @@ void StartButtons(void const * argument)
   /* USER CODE END StartButtons */
 }
 
+/* USER CODE BEGIN Header_StartTask05 */
+/**
+* @brief Function implementing the myEEPROM thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask05 */
+void StartTask05(void const * argument)
+{
+  /* USER CODE BEGIN StartTask05 */
+	/*xBuffer[0]='A';
+	
+	//xBuffer[0] = 'M'; //0x4D
+  HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&af, 4, 5);	//write to memory address 08 
+	osDelay(10);
+	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&bf, 4, 5); //read memory address 08
+*/
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartTask05 */
+}
+
+/* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 /* USER CODE END Application */
 

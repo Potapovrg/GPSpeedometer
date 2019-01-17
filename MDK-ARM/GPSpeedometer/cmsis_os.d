@@ -5,7 +5,6 @@
 .\gpspeedometer\cmsis_os.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\gpspeedometer\cmsis_os.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\gpspeedometer\cmsis_os.o: ../Inc/FreeRTOSConfig.h
-.\gpspeedometer\cmsis_os.o: ../Inc/main.h
 .\gpspeedometer\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\gpspeedometer\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 .\gpspeedometer\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

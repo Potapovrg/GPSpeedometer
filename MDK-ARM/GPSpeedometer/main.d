@@ -22,6 +22,7 @@
 .\gpspeedometer\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h
 .\gpspeedometer\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 .\gpspeedometer\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
+.\gpspeedometer\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 .\gpspeedometer\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 .\gpspeedometer\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 .\gpspeedometer\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
@@ -42,6 +43,7 @@
 .\gpspeedometer\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 .\gpspeedometer\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 .\gpspeedometer\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
+.\gpspeedometer\main.o: ../Inc/i2c.h
 .\gpspeedometer\main.o: ../Inc/spi.h
 .\gpspeedometer\main.o: ../Inc/usart.h
 .\gpspeedometer\main.o: ../Inc/gpio.h

@@ -4,7 +4,6 @@
 .\gpspeedometer\heap_4.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\gpspeedometer\heap_4.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\gpspeedometer\heap_4.o: ../Inc/FreeRTOSConfig.h
-.\gpspeedometer\heap_4.o: ../Inc/main.h
 .\gpspeedometer\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\gpspeedometer\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 .\gpspeedometer\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
