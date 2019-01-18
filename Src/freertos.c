@@ -277,7 +277,11 @@ void StartDefaultTask(void const * argument)
 void StartLCD(void const * argument)
 {
   /* USER CODE BEGIN StartLCD */
-	//uint8_t buttons_state = 0;
+	Disp.pos2 = 0;
+	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
+	and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
+	//osDelay(10);
+  //HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
   /* Infinite loop */
   for(;;)
   {
@@ -303,14 +307,6 @@ void StarGPS_parser(void const * argument)
 {
   /* USER CODE BEGIN StarGPS_parser */
 	float Dist;
-	/*HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&af, 4, 5);
-	osDelay(10);
-	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&bf, 4, 5);
-	osDelay(10);*/
-	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);
-  HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
-	//read memory address 08
-	//Race.odo2 = 10;
 	Previous_Position.Lat = 0;
 	Current_position.Lat = 0;
 	Previous_Position.Lon = 0;
@@ -321,22 +317,21 @@ void StarGPS_parser(void const * argument)
 		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
-		if (GPS.status != 'V')	
+		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
 		{
 			if (Previous_Position.Lat != 0)
 			{
-				//Dist = DistanceKm(&Previous_Position,&Current_position);
-				Dist = DistanceBetween(&Previous_Position,&Current_position);
-			//Dist = 1.0;
+				Dist = DistanceKm(&Previous_Position,&Current_position);
+				//Dist = DistanceBetween(&Previous_Position,&Current_position);
 				if (Dist < 0.2)
 				{					
 				Race.odo1 += Dist;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);
 				Race.odo2 += Dist;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
+				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
 				}
-				//if (Race.odo1 > 99.99) Race.odo1 = 0;
 			}
+				//if (Race.odo1 > 99.99) Race.odo1 = 0;
 			Previous_Position.Lat = Current_position.Lat;
 			Previous_Position.Lon = Current_position.Lon;
 		}
@@ -381,7 +376,12 @@ void StartButtons(void const * argument)
 			buttons_state |= (1 << 3);
     else
 			buttons_state &= ~(1 << 3);
-		
+		  
+			if (buttons_state & 1<<0){
+				Race.odo1 += 0.1;
+				Race.odo2 += 0.1;
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
+			}
 			if (buttons_state & 1<<1){
 				Disp.pos2++;
 				if (Disp.pos2>3) Disp.pos2 = 0; 
