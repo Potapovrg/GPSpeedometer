@@ -129,6 +129,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 	if (UartHandle->Instance == USART1)
 	{
 		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
+		if ((GPS_buff_pos == 40)&& (GPS_buffer[0] != '$'))
+		{
+			HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
+		}
 		if (UART_byte == 0x0A)
 		{
 //			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
@@ -145,10 +149,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 			GPS_buffer[GPS_buff_pos]=UART_byte;
 			GPS_buff_pos++;
 			if (GPS_buff_pos > BUFFSIZE - 1) GPS_buff_pos = 0; 
+			HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 			//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		}
 	}
-	HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+	
 }
 
  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -311,7 +316,9 @@ void StarGPS_parser(void const * argument)
 		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
-		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
+		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+		//if ((GPS.status != 'V')&&(GPS.Speed.kelometers>2))	
+		if (GPS.status != 'V')
 		{
 			if (Previous_Position.Lat != 0)
 			{
@@ -331,9 +338,8 @@ void StarGPS_parser(void const * argument)
 		GPS_buff_pos = 0;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
 		//xSemaphoreGive(myBinarySemUART_ISRHandle);
-		//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		vTaskSuspend(myGPS_parserHandle);
-    osDelay(1);
+    //osDelay(1);
   }
 	
   /* USER CODE END StarGPS_parser */
