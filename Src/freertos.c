@@ -88,8 +88,7 @@
 /* USER CODE BEGIN Variables */
 u8g2_t u8g2;
 #define StartParcing() HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1)
-#define OFFSET 1
-#define HEIGHT
+
 char UART_byte=0;
 char GPS_buffer[BUFFSIZE];
 char Screen_buffer[15];
@@ -100,12 +99,7 @@ Display Disp;
 __IO ITStatus UartReady = RESET;
 Position Previous_Position,Current_position; 
 uint8_t buttons_state, buttons_long_press_state;
-
-float af = 5.7;
-float bf = 3.2;
-
-uint8_t xBuffer[1];
-uint8_t yBuffer[1]; 
+	int i=65535;
 #define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */
  
 #define MEMORY_ADDRESS                                                    0x00
@@ -150,9 +144,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 		{
 			GPS_buffer[GPS_buff_pos]=UART_byte;
 			GPS_buff_pos++;
-			HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+			if (GPS_buff_pos > BUFFSIZE - 1) GPS_buff_pos = 0; 
+			//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		}
 	}
+	HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 }
 
  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -280,8 +276,6 @@ void StartLCD(void const * argument)
 	Disp.pos2 = 0;
 	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
 	and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
-	//osDelay(10);
-  //HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
   /* Infinite loop */
   for(;;)
   {
@@ -328,7 +322,6 @@ void StarGPS_parser(void const * argument)
 				Race.odo1 += Dist;
 				Race.odo2 += Dist;
 				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
-				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
 				}
 			}
 				//if (Race.odo1 > 99.99) Race.odo1 = 0;
@@ -338,7 +331,7 @@ void StarGPS_parser(void const * argument)
 		GPS_buff_pos = 0;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
 		//xSemaphoreGive(myBinarySemUART_ISRHandle);
-		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+		//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		vTaskSuspend(myGPS_parserHandle);
     osDelay(1);
   }
@@ -356,6 +349,7 @@ void StarGPS_parser(void const * argument)
 void StartButtons(void const * argument)
 {
   /* USER CODE BEGIN StartButtons */
+	//int i=65535;
   /* Infinite loop */
   for(;;)
   {
@@ -378,9 +372,13 @@ void StartButtons(void const * argument)
 			buttons_state &= ~(1 << 3);
 		  
 			if (buttons_state & 1<<0){
-				Race.odo1 += 0.1;
+				/*Race.odo1 += 0.1;
 				Race.odo2 += 0.1;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
+				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);*/
+				//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);	
+				i -= 10000;
+				if (i < 10000) i = 65535;
+				TIM2->CCR1=i;
 			}
 			if (buttons_state & 1<<1){
 				Disp.pos2++;

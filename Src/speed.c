@@ -101,10 +101,12 @@ void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uin
 			u8g2_DrawStr(&u8g2,14,28,"LOC");
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
-			sprintf(buf,"%010d",Pos->Lat);
-			u8g2_DrawStr(&u8g2,38,14,buf);
-			sprintf(buf,"%010d",Pos->Lon);
-			u8g2_DrawStr(&u8g2,38,28,buf);
+			//sprintf(buf,"%010d",Pos->Lat);
+			sprintf(buf,"%c%03d %02d.%04d",GPS->Latitude.sign, GPS->Latitude.degrees, GPS->Latitude.minutes, GPS->Latitude.tenth_minutes);
+			u8g2_DrawStr(&u8g2,20,14,buf);
+			//sprintf(buf,"%010d",Pos->Lon);
+			sprintf(buf,"%c%03d %02d.%04d",GPS->Longitude.sign, GPS->Longitude.degrees, GPS->Longitude.minutes, GPS->Longitude.tenth_minutes);
+			u8g2_DrawStr(&u8g2,20,28,buf);
 		break;
 	}
 	
