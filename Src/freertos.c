@@ -316,7 +316,6 @@ void StarGPS_parser(void const * argument)
 		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
-		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		//if ((GPS.status != 'V')&&(GPS.Speed.kelometers>2))	
 		if (GPS.status != 'V')
 		{
@@ -338,6 +337,7 @@ void StarGPS_parser(void const * argument)
 		GPS_buff_pos = 0;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
 		//xSemaphoreGive(myBinarySemUART_ISRHandle);
+		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		vTaskSuspend(myGPS_parserHandle);
     //osDelay(1);
   }
