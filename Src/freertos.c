@@ -278,19 +278,23 @@ void StartDefaultTask(void const * argument)
 void StartLCD(void const * argument)
 {
   /* USER CODE BEGIN StartLCD */
+	TickType_t xLastWakeTime;
+	const TickType_t xFrequency = 100;
+	xLastWakeTime = xTaskGetTickCount();
 	Disp.pos2 = 0;
 	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
 	and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
   /* Infinite loop */
   for(;;)
   {
+		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
 		u8g2_ClearBuffer(&u8g2);
 		rallycomp(&Current_position,&GPS, &Race, &Disp, buttons_state);
 		u8g2_SendBuffer(&u8g2);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
-    osDelay(100);
+    //osDelay(100);
   }
   /* USER CODE END StartLCD */
 }
