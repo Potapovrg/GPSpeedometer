@@ -62,6 +62,7 @@
 #include "speed.h"
 #include "usart.h"
 #include "i2c.h"
+#include "adc.h"
 #include "string.h"
 #include "GPS_Parser.h"
 #include "Location.h"
@@ -76,7 +77,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define    DWT_CYCCNT    *(volatile unsigned long *)0xE0001004
+#define    DWT_CONTROL   *(volatile unsigned long *)0xE0001000
+#define    SCB_DEMCR     *(volatile unsigned long *)0xE000EDFC
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -88,7 +91,7 @@
 /* USER CODE BEGIN Variables */
 u8g2_t u8g2;
 #define StartParcing() HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1)
-
+uint32_t count_tic = 0;
 char UART_byte=0;
 char GPS_buffer[BUFFSIZE];
 char Screen_buffer[15];
@@ -99,9 +102,9 @@ Display Disp;
 __IO ITStatus UartReady = RESET;
 Position Previous_Position,Current_position; 
 uint8_t buttons_state, buttons_long_press_state;
-	int i=65535;
-#define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */
- 
+int i=65535;
+uint32_t adc=0;
+#define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */ 
 #define MEMORY_ADDRESS                                                    0x00
 #define ODO1_ADDRESS 0x00
 #define ODO2_ADDRESS 0x04
@@ -165,6 +168,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
          taskYIELD();
      }
 } 
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
+
+{
+		adc = (uint32_t) HAL_ADC_GetValue(&hadc2);
+}
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -278,8 +287,8 @@ void StartDefaultTask(void const * argument)
 void StartLCD(void const * argument)
 {
   /* USER CODE BEGIN StartLCD */
+	SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = 100;
 	xLastWakeTime = xTaskGetTickCount();
 	Disp.pos2 = 0;
 	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
@@ -290,9 +299,12 @@ void StartLCD(void const * argument)
 		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
+		DWT_CYCCNT = 0;
+		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; 
 		u8g2_ClearBuffer(&u8g2);
 		rallycomp(&Current_position,&GPS, &Race, &Disp, buttons_state);
 		u8g2_SendBuffer(&u8g2);
+		count_tic = DWT_CYCCNT;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
     //osDelay(100);
   }

@@ -51,6 +51,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "adc.h"
 #include "i2c.h"
 #include "spi.h"
 #include "tim.h"
@@ -132,6 +133,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
+  MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
@@ -139,6 +141,7 @@ int main(void)
 	u8g2_SetPowerSave(&u8g2, 0);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	TIM2->CCR1=65535;
+	HAL_ADC_Start_IT(&hadc2);
 	//HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_1, 5000);
 /* 
 	wake up display. Need to add display clear to this function:
@@ -174,6 +177,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /**Initializes the CPU, AHB and APB busses clocks 
   */
@@ -198,6 +202,12 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
