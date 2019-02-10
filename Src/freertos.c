@@ -114,6 +114,9 @@ enum mode work_mode = debug;
 #define ODO2_ADDRESS 0x04
 
 
+const char change_baudrate[28] ={0xb5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xd0,0x08,0x00,0x00,0x00,0xc2,0x01,0x00,0x07,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0xc0,0x7e};
+const char change_rate[14] = {0xb5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7a,0x12};
+
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId myLCDHandle;
@@ -191,6 +194,24 @@ void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
 			__HAL_ADC_DISABLE_IT(hadc2, ADC_IT_AWD);
 			break;
 	}
+}
+
+void USART1_115200_Init(void)
+{
+
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
 }
 
 /*void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
@@ -292,6 +313,14 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+	HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate,28,0xFFFF);
+	HAL_UART_MspDeInit(&huart1);
+	USART1->BRR = UART_BRR_SAMPLING8(HAL_RCC_GetPCLK2Freq(), 115200);
+	//USART1_115200_Init();
+	HAL_UART_MspInit(&huart1);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&change_rate,14,0xFFFF);
+	/*__HAL_RCC_USART1_CLK_DISABLE();
+	__HAL_RCC_USART1_CLK_ENABLE();*/
 	StartParcing();
   for(;;)
   {
