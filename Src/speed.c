@@ -9,14 +9,12 @@ struct float_distance
 };
 
 char buf[15];
-uint32_t a=0;
+//uint32_t a=0;
 
 void speedo(void) {         
   u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);  
   //u8g2_DrawStr(&u8g2,-5,30,"  0");
-	sprintf(buf, "%i\n", a);
 	u8g2_DrawStr(&u8g2,0,30,buf);
-	a++;
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
   u8g2_DrawStr(&u8g2,53,30,"Km/h");
   u8g2_DrawStr(&u8g2,0,45,"A+:40576.2");

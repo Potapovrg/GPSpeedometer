@@ -1,7 +1,11 @@
 #MicroXplorer Configuration settings - do not modify
+ADC2.AWD1HighThreshold=4095
+ADC2.AWD1ITMode=ENABLE
+ADC2.AWD1LowThreshold=600
 ADC2.Channel-0\#ChannelRegularConversion=ADC_CHANNEL_0
 ADC2.ContinuousConvMode=ENABLE
-ADC2.IPParameters=Rank-0\#ChannelRegularConversion,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,ContinuousConvMode
+ADC2.EnableAnalogWatchDog=true
+ADC2.IPParameters=Rank-0\#ChannelRegularConversion,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,ContinuousConvMode,EnableAnalogWatchDog,AWD1HighThreshold,AWD1LowThreshold,AWD1ITMode
 ADC2.NbrOfConversionFlag=1
 ADC2.Rank-0\#ChannelRegularConversion=1
 ADC2.SamplingTime-0\#ChannelRegularConversion=ADC_SAMPLETIME_1CYCLE_5

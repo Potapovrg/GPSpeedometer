@@ -104,6 +104,10 @@ Position Previous_Position,Current_position;
 uint8_t buttons_state, buttons_long_press_state;
 int i=65535;
 uint32_t adc=0;
+int a = 0;
+enum mode {normal, power_off, debug};
+//enum mode work_mode = normal;
+enum mode work_mode = debug;
 #define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */ 
 #define MEMORY_ADDRESS                                                    0x00
 #define ODO1_ADDRESS 0x00
@@ -169,6 +173,25 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
      }
 } 
 
+void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
+{
+	a++;
+	switch (work_mode){
+		case power_off:
+				work_mode = normal;
+			  ADC2 ->HTR = 4095;
+				ADC2 ->LTR = 3500;
+			break;
+		case normal:
+				work_mode = power_off;
+				ADC2 ->HTR = 3000;
+				ADC2 ->LTR = 0;
+			break;
+		case debug:
+			__HAL_ADC_DISABLE_IT(hadc2, ADC_IT_AWD);
+			break;
+	}
+}
 
 /*void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
 
