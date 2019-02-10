@@ -169,11 +169,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
      }
 } 
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
+
+/*void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
 
 {
 		adc = (uint32_t) HAL_ADC_GetValue(&hadc2);
-}
+}*/
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -297,6 +298,7 @@ void StartLCD(void const * argument)
   for(;;)
   {
 		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
+		adc = (uint32_t) HAL_ADC_GetValue(&hadc2);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
 		DWT_CYCCNT = 0;

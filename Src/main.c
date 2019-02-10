@@ -141,7 +141,7 @@ int main(void)
 	u8g2_SetPowerSave(&u8g2, 0);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	TIM2->CCR1=65535;
-	HAL_ADC_Start_IT(&hadc2);
+	HAL_ADC_Start(&hadc2);
 	//HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_1, 5000);
 /* 
 	wake up display. Need to add display clear to this function:

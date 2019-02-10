@@ -17,8 +17,8 @@ int *token_length = token;
 
 void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS, Position *Position)
 {
-
-	int32_t first_part, second_part;
+	int32_t degrees, minutes, part_minutes; 
+	//int32_t first_part, second_part;
 	char *token1 = GPS_buffer;
 	while (*GPS_buffer != '\0')
 	{
@@ -58,17 +58,23 @@ void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS, Position *Position)
 		
 		sscanf(GPS_buffer+*(token_length+LONGITUDE_SIGN_POSITION),LONGITUDE_SIGN_FORMAT,&GPS->Longitude.sign);
 		sscanf(GPS_buffer+*(token_length+DATE_POSITION),DATE_FORMAT,&GPS->Date.day,&GPS->Date.month,&GPS->Date.year);
-
-			if (GPS->status != 'V')
-			{
+		
+		if (GPS->status != 'V')
+			{/*
 				sscanf(GPS_buffer+*(token_length+LATITUDE_POSITION),"%5d.%5d",&first_part,&second_part);
 				Position->Lat = first_part*100000+second_part;
 				sscanf(GPS_buffer+*(token_length+LONGITUDE_POSITION),"%5d.%5d",&first_part,&second_part);
-				Position->Lon = first_part*100000+second_part;		
+				Position->Lon = first_part*100000+second_part;	*/
+
+				sscanf(GPS_buffer+*(token_length+LATITUDE_POSITION),"%2d%2d.%5d",&degrees,&minutes,&part_minutes);
+				Position->Lat = degrees*10000000+(minutes*1000000)/6+(part_minutes*10)/6;
+				sscanf(GPS_buffer+*(token_length+LONGITUDE_POSITION),"%3d%2d.%5d",&degrees,&minutes,&part_minutes);
+				Position->Lon = degrees*10000000+(minutes*1000000)/6+(part_minutes*10)/6;	
 			}
+		
 	}
-	else if (strncmp(GPS_buffer+3, "VTG", 3)==0)
-	{
-		sscanf(GPS_buffer+*(token_length+SPEED_POSITION),SPEED_FORMAT,&GPS->Speed.kelometers,&GPS->Speed.tenth_kelometers);	
-	}
+		else if (strncmp(GPS_buffer+3, "VTG", 3)==0)
+			{
+			sscanf(GPS_buffer+*(token_length+SPEED_POSITION),SPEED_FORMAT,&GPS->Speed.kelometers,&GPS->Speed.tenth_kelometers);	
+			}
 }
