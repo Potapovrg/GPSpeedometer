@@ -116,7 +116,15 @@ enum mode work_mode = debug;
 
 const char change_baudrate[28] ={0xb5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xd0,0x08,0x00,0x00,0x00,0xc2,0x01,0x00,0x07,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0xc0,0x7e};
 const char change_rate[14] = {0xb5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7a,0x12};
+const char turn_off_gga[11] = {0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x00,0x00,0xfa,0x0f};
+const char turn_off_gns[11] = {0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x01,0x00,0xfb,0x11};
+const char turn_off_gsa[11] = {0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x02,0x00,0xfc,0x13};
+const char turn_off_gsv[11] = {0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x03,0x00,0xfd,0x15};
 
+/*????????? GGA: 0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x00,0x00,0xfa,0x0f
+????????? GNS: 0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x01,0x00,0xfb,0x11
+????????? GSA: 0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x02,0x00,0xfc,0x13
+????????? GSV: 0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x03,0x00,0xfd,0x15 */
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId myLCDHandle;
@@ -138,11 +146,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 		
 	if (UartHandle->Instance == USART1)
 	{
-		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
-		if ((GPS_buff_pos == 40)&& (GPS_buffer[0] != '$'))
-		{
-			HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
-		}
+		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
 		if (UART_byte == 0x0A)
 		{
 //			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
@@ -313,17 +317,30 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-	HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate,28,0xFFFF);
-	HAL_UART_MspDeInit(&huart1);
-	USART1->BRR = UART_BRR_SAMPLING8(HAL_RCC_GetPCLK2Freq(), 115200);
-	//USART1_115200_Init();
-	HAL_UART_MspInit(&huart1);
+	osDelay(1000);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gga,11,0xFFFF);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsv,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&change_rate,14,0xFFFF);
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate,28,0xFFFF);
+	//HAL_UART_MspDeInit(&huart1);
+	/*USART1->CR1 &= USART_CR1_UE;
+	USART1->BRR = UART_BRR_SAMPLING8(HAL_RCC_GetPCLK2Freq(), 115200);
+	USART1->CR1 |= USART_CR1_UE;*/
+	//USART1_115200_Init();
+	//osDelay(1000);
+	//HAL_UART_MspInit(&huart1);
+	//osDelay(100);
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&change_rate,14,0xFFFF);
+
 	/*__HAL_RCC_USART1_CLK_DISABLE();
 	__HAL_RCC_USART1_CLK_ENABLE();*/
 	StartParcing();
   for(;;)
   {
+		/*char test[] = "test";
+		HAL_UART_Transmit(&huart1,(uint8_t*)&test,4,0xFFFF);*/
 				osDelay(1);
   }
 
@@ -383,15 +400,17 @@ void StarGPS_parser(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
 		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
+		a++;
 		//if ((GPS.status != 'V')&&(GPS.Speed.kelometers>2))	
 		if (GPS.status != 'V')
 		{
 			if (Previous_Position.Lat != 0)
 			{
-				Dist = DistanceKm(&Previous_Position,&Current_position);
+				//Dist = DistanceKm(&Previous_Position,&Current_position);
 				//Dist = DistanceBetween(&Previous_Position,&Current_position);
 				if (Dist < 0.2)
 				{					
