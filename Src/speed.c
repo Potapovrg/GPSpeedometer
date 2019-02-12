@@ -53,7 +53,7 @@ void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uin
 	if (Race->odo1 < 10.0) shift = 19;
 	else shift = 0;
 	u8g2_DrawStr(&u8g2,43+shift,64,buf);
-
+	if (Disp->pos2>4) Disp->pos2 = 0; 
 	switch (Disp->pos2){
 		case 0:
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
@@ -105,6 +105,15 @@ void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uin
 			//sprintf(buf,"%010d",Pos->Lon);
 			sprintf(buf,"%c%03d %02d.%04d",GPS->Longitude.sign, GPS->Longitude.degrees, GPS->Longitude.minutes, GPS->Longitude.tenth_minutes);
 			u8g2_DrawStr(&u8g2,20,28,buf);
+		break;
+		case 4:
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_SetFontDirection(&u8g2,3);
+			u8g2_DrawStr(&u8g2,14,28,"VLT");
+			u8g2_SetFontDirection(&u8g2,0);
+			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
+			sprintf(buf,"%4d",Race->voltage);
+			u8g2_DrawStr(&u8g2,43,30,buf);
 		break;
 	}
 	

@@ -106,8 +106,8 @@ int i=65535;
 uint32_t adc=0;
 int a = 0;
 enum mode {normal, power_off, debug};
-//enum mode work_mode = normal;
-enum mode work_mode = debug;
+enum mode work_mode = normal;
+//enum mode work_mode = debug;
 #define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */ 
 #define MEMORY_ADDRESS                                                    0x00
 #define ODO1_ADDRESS 0x00
@@ -116,8 +116,10 @@ enum mode work_mode = debug;
 
 const char change_baudrate[28] ={0xb5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xd0,0x08,0x00,0x00,0x00,0xc2,0x01,0x00,0x07,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0xc0,0x7e};
 const char change_baudrate_uart_only[28] ={0xb5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xd0,0x08,0x00,0x00,0x00,0xc2,0x01,0x00,0x07,0x00,0x02,0x00,0x00,0x00,0x00,0x00,0xbf,0x78};
+const char uart_only[26] ={0xb5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xd0,0x08,0x00,0x00,0x80,0x25,0x00,0x00,0x07,0x00,0x02,0x00,0x00,0x00,0x00,0x00};
 const char rate_10hz[14] = {0xb5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7a,0x12};
 const char rate_5hz[14] = {0xb5,0x62,0x06,0x08,0x06,0x00,0xc8,0x00,0x01,0x00,0x01,0x00,0xde,0x6a};
+const char rate_2hz[13] = {0xb5,0x62,0x06,0x08,0x06,0x00,0xf4,0x01,0x01,0x00,0x01,0x00,0x0b};
 const char gl_gps_only[28] = {0xb5,0x62,0x06,0x3e,0x14,0x00,0x00,0x00,0x20,0x02,0x00,0x08,0x10,0x00,0x01,0x00,0x01,0x01,0x06,0x08,0x0e,0x00,0x01,0x00,0x01,0x01,0xb4,0x76};
 const char turn_off_gga[11] = {0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x00,0x00,0xfa,0x0f};
 const char turn_off_gns[11] = {0xb5,0x62,0x06,0x01,0x03,0x00,0xf0,0x01,0x00,0xfb,0x11};
@@ -185,40 +187,22 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 
 void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
 {
-	a++;
 	switch (work_mode){
 		case power_off:
+			  HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
 				work_mode = normal;
 			  ADC2 ->HTR = 4095;
-				ADC2 ->LTR = 3500;
+				ADC2 ->LTR = 1400;
 			break;
 		case normal:
 				work_mode = power_off;
-				ADC2 ->HTR = 3000;
+				ADC2 ->HTR = 1200;
 				ADC2 ->LTR = 0;
 			break;
 		case debug:
 			__HAL_ADC_DISABLE_IT(hadc2, ADC_IT_AWD);
 			break;
 	}
-}
-
-void USART1_115200_Init(void)
-{
-
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
 }
 
 /*void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
@@ -325,13 +309,15 @@ void StartDefaultTask(void const * argument)
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsv,11,0xFFFF);
-	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&gl_gps_only,28,0xFFFF);
-	HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate_uart_only,28,0xFFFF);
-
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate_uart_only,28,0xFFFF);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&uart_only,26,0xFFFF);
+/*
 	__HAL_UART_DISABLE(&huart1);
 	USART1->BRR = 640;
-	__HAL_UART_ENABLE(&huart1);
+	__HAL_UART_ENABLE(&huart1);*/
 
 	StartParcing();
   for(;;)
@@ -356,14 +342,13 @@ void StartLCD(void const * argument)
 	SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	Disp.pos2 = 0;
+	Disp.pos2 = 4;
 	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
 	and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
   /* Infinite loop */
   for(;;)
   {
 		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
-		adc = (uint32_t) HAL_ADC_GetValue(&hadc2);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
 		DWT_CYCCNT = 0;
@@ -398,15 +383,14 @@ void StarGPS_parser(void const * argument)
   {
 		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
 		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
-		//xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
+		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
-		a++;
 		//if ((GPS.status != 'V')&&(GPS.Speed.kelometers>2))	
 		if (GPS.status != 'V')
 		{
 			if (Previous_Position.Lat != 0)
 			{
-				//Dist = DistanceKm(&Previous_Position,&Current_position);
+				Dist = DistanceKm(&Previous_Position,&Current_position);
 				//Dist = DistanceBetween(&Previous_Position,&Current_position);
 				if (Dist < 0.2)
 				{					
@@ -463,9 +447,10 @@ void StartButtons(void const * argument)
 			buttons_state &= ~(1 << 3);
 		  
 			if (buttons_state & 1<<0){
-				/*Race.odo1 += 0.1;
-				Race.odo2 += 0.1;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);*/
+				//Race.odo1 += 0.1;
+				//Race.odo2 += 0.1;
+				HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
+				/*HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);*/
 				//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);	
 				i -= 10000;
 				if (i < 10000) i = 65535;
@@ -473,7 +458,6 @@ void StartButtons(void const * argument)
 			}
 			if (buttons_state & 1<<1){
 				Disp.pos2++;
-				if (Disp.pos2>3) Disp.pos2 = 0; 
 			}
 			if (buttons_state & 1<<2)
 			{
@@ -513,7 +497,8 @@ void StartTask05(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    Race.voltage = (uint32_t) HAL_ADC_GetValue(&hadc2);
+		osDelay(1000);
   }
   /* USER CODE END StartTask05 */
 }

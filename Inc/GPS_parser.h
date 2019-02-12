@@ -79,6 +79,7 @@ typedef struct {
 typedef struct {
 	float odo1;
 	float odo2;
+	uint32_t voltage;
 }Race_data;
 
 #endif
