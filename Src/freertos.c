@@ -94,6 +94,7 @@ u8g2_t u8g2;
 uint32_t count_tic = 0;
 char UART_byte=0;
 char GPS_buffer[BUFFSIZE];
+char GPS_buffer_rx[BUFFSIZE];
 char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
 GPS_data GPS;
@@ -148,10 +149,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 /*	static portBASE_TYPE xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken = pdFALSE;*/
 	BaseType_t xYieldRequired;
-		
 	if (UartHandle->Instance == USART1)
 	{
-		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
+		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
 		if (UART_byte == 0x0A)
 		{
 //			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
@@ -168,7 +169,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 			GPS_buffer[GPS_buff_pos]=UART_byte;
 			GPS_buff_pos++;
 			if (GPS_buff_pos > BUFFSIZE - 1) GPS_buff_pos = 0; 
-			HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+			//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 			//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		}
 	}
@@ -309,11 +310,11 @@ void StartDefaultTask(void const * argument)
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsv,11,0xFFFF);
-	//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
-	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
-	HAL_UART_Transmit(&huart1,(uint8_t*)&gl_gps_only,28,0xFFFF);
-	//HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate_uart_only,28,0xFFFF);
-	HAL_UART_Transmit(&huart1,(uint8_t*)&uart_only,26,0xFFFF);
+	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
+	/*HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&gl_gps_only,28,0xFFFF);
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate_uart_only,28,0xFFFF);*/
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&uart_only,26,0xFFFF);
 /*
 	__HAL_UART_DISABLE(&huart1);
 	USART1->BRR = 640;
@@ -342,7 +343,7 @@ void StartLCD(void const * argument)
 	SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	Disp.pos2 = 4;
+	Disp.pos2 = 0;
 	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
 	and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
   /* Infinite loop */
@@ -351,12 +352,12 @@ void StartLCD(void const * argument)
 		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
-		DWT_CYCCNT = 0;
-		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; 
+		/*DWT_CYCCNT = 0;
+		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; */
 		u8g2_ClearBuffer(&u8g2);
 		rallycomp(&Current_position,&GPS, &Race, &Disp, buttons_state);
 		u8g2_SendBuffer(&u8g2);
-		count_tic = DWT_CYCCNT;
+		//count_tic = DWT_CYCCNT;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
     //osDelay(100);
   }
@@ -381,10 +382,16 @@ void StarGPS_parser(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
 		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
+		DWT_CYCCNT = 0;
+		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; 
+		memcpy(GPS_buffer_rx,GPS_buffer,BUFFSIZE);
+		count_tic = DWT_CYCCNT;
+		GPS_buff_pos = 0;
+		//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
-		Parce_NMEA_string(GPS_buffer, &GPS, &Current_position);
+		Parce_NMEA_string(GPS_buffer_rx, &GPS, &Current_position);
 		//if ((GPS.status != 'V')&&(GPS.Speed.kelometers>2))	
 		if (GPS.status != 'V')
 		{
@@ -403,10 +410,10 @@ void StarGPS_parser(void const * argument)
 			Previous_Position.Lat = Current_position.Lat;
 			Previous_Position.Lon = Current_position.Lon;
 		}
-		GPS_buff_pos = 0;
+		//GPS_buff_pos = 0;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
 		//xSemaphoreGive(myBinarySemUART_ISRHandle);
-		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
+		//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		vTaskSuspend(myGPS_parserHandle);
     //osDelay(1);
   }
@@ -449,7 +456,8 @@ void StartButtons(void const * argument)
 			if (buttons_state & 1<<0){
 				//Race.odo1 += 0.1;
 				//Race.odo2 += 0.1;
-				HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
+				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
+				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
 				/*HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);*/
 				//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);	
 				i -= 10000;
@@ -461,6 +469,7 @@ void StartButtons(void const * argument)
 			}
 			if (buttons_state & 1<<2)
 			{
+				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF); 
 				Race.odo2 = 0;
 				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
 			}
