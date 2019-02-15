@@ -1,7 +1,4 @@
 #include "GPS_parser.h"
-#include "string.h"
-#include <stdio.h>
-#include "math.h"
 
 int coma;
 int eol;
@@ -75,6 +72,7 @@ void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS, Position *Position)
 	}
 		else if (strncmp(GPS_buffer+3, "VTG", 3)==0)
 			{
-			sscanf(GPS_buffer+*(token_length+SPEED_POSITION),SPEED_FORMAT,&GPS->Speed.kelometers,&GPS->Speed.tenth_kelometers);	
+				sscanf(GPS_buffer+*(token_length+COARSE_POSITION),COARSE_FORMAT,&GPS->Coarse);	
+				sscanf(GPS_buffer+*(token_length+SPEED_POSITION),SPEED_FORMAT,&GPS->Speed.kelometers,&GPS->Speed.tenth_kelometers);	
 			}
 }

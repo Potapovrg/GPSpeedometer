@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include "string.h"
+
 
 #define BUFFSIZE 200
 #define TIME_FORMAT "%2d%2d%2d.%2d"
@@ -19,6 +21,8 @@
 #define LONGITUDE_SIGN_POSITION 5
 #define DATE_FORMAT "%2d%2d%2d"
 #define DATE_POSITION 8
+#define COARSE_FORMAT "%3d"
+#define COARSE_POSITION 0
 #define SPEED_FORMAT "%3d.%2d"
 #define SPEED_POSITION 6
 /*#define _FORMAT
@@ -33,6 +37,7 @@ typedef struct {
 	char status;
 	char RMC_status;
 	char VTG_status;
+	int Coarse;
 	struct {
 		int h;
 		int m;
@@ -79,7 +84,7 @@ typedef struct {
 typedef struct {
 	float odo1;
 	float odo2;
-	uint32_t voltage;
+	float voltage;
 }Race_data;
 
 #endif

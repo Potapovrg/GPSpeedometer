@@ -67,6 +67,7 @@
 #include "GPS_Parser.h"
 #include "Location.h"
 #include "Simple_distance.h"
+#include "eeprom.h"
 
 /* USER CODE END Includes */
 
@@ -99,6 +100,7 @@ char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
 GPS_data GPS;
 Race_data Race;
+eeprom_struct eeprom;
 Display Disp;
 __IO ITStatus UartReady = RESET;
 Position Previous_Position,Current_position; 
@@ -109,10 +111,7 @@ int a = 0;
 enum mode {normal, power_off, debug};
 enum mode work_mode = normal;
 //enum mode work_mode = debug;
-#define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */ 
-#define MEMORY_ADDRESS                                                    0x00
-#define ODO1_ADDRESS 0x00
-#define ODO2_ADDRESS 0x04
+
 
 
 const char change_baudrate[28] ={0xb5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xd0,0x08,0x00,0x00,0x00,0xc2,0x01,0x00,0x07,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0xc0,0x7e};
@@ -190,10 +189,11 @@ void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
 {
 	switch (work_mode){
 		case power_off:
-			  HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
+			  //HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
+				eeprom_write(&eeprom);
 				work_mode = normal;
 			  ADC2 ->HTR = 4095;
-				ADC2 ->LTR = 1400;
+				ADC2 ->LTR = 1350;
 			break;
 		case normal:
 				work_mode = power_off;
@@ -305,7 +305,7 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-	osDelay(1000);
+	osDelay(500);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gga,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
@@ -344,8 +344,9 @@ void StartLCD(void const * argument)
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
 	Disp.pos2 = 0;
-	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
-	and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
+	eeprom_read(&eeprom,&Disp,&Race);
+	//HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
+	//and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
   /* Infinite loop */
   for(;;)
   {
@@ -403,7 +404,10 @@ void StarGPS_parser(void const * argument)
 				{					
 				Race.odo1 += Dist;
 				Race.odo2 += Dist;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
+				eeprom.odo1 = Race.odo1;
+				eeprom.odo2 = Race.odo2;
+				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
+				
 				}
 			}
 				//if (Race.odo1 > 99.99) Race.odo1 = 0;
@@ -454,11 +458,14 @@ void StartButtons(void const * argument)
 			buttons_state &= ~(1 << 3);
 		  
 			if (buttons_state & 1<<0){
-				//Race.odo1 += 0.1;
-				//Race.odo2 += 0.1;
+				Race.odo1 += 0.1;
+				Race.odo2 += 0.1;
 				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
 				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
-				/*HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);*/
+				eeprom.odo1 = Race.odo1;
+				eeprom.odo2 = Race.odo2;
+				//eeprom_write(&eeprom);
+				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
 				//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);	
 				i -= 10000;
 				if (i < 10000) i = 65535;
@@ -506,7 +513,8 @@ void StartTask05(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    Race.voltage = (uint32_t) HAL_ADC_GetValue(&hadc2);
+    Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096 + 0.38;
+		//a = sizeof (eeprom);
 		osDelay(1000);
   }
   /* USER CODE END StartTask05 */

@@ -3,11 +3,13 @@
 #include <stdio.h>
 #include "GPS_parser.h"
 
+#ifndef DISPLAY_STRUCT
+#define DISPLAY_STRUCT
 typedef struct {
 	uint8_t pos1;
 	uint8_t pos2;
 }Display;
-
+#endif
 
 void speedo(void);
 //void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);
