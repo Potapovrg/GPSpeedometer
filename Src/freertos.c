@@ -68,6 +68,7 @@
 #include "Location.h"
 #include "Simple_distance.h"
 #include "eeprom.h"
+#include "math.h"
 
 /* USER CODE END Includes */
 
@@ -108,6 +109,8 @@ uint8_t buttons_state, buttons_long_press_state;
 int i=65535;
 uint32_t adc=0;
 int a = 0;
+
+double km;
 enum mode {normal, power_off, debug};
 enum mode work_mode = normal;
 //enum mode work_mode = debug;
@@ -343,7 +346,7 @@ void StartLCD(void const * argument)
 	SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	Disp.pos2 = 0;
+	//Disp.pos2 = 0;
 	eeprom_read(&eeprom,&Disp,&Race);
 	//HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
 	//and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
@@ -393,8 +396,8 @@ void StarGPS_parser(void const * argument)
 		//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer_rx, &GPS, &Current_position);
-		//if ((GPS.status != 'V')&&(GPS.Speed.kelometers>2))	
-		if (GPS.status != 'V')
+		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
+		//if (GPS.status != 'V')
 		{
 			if (Previous_Position.Lat != 0)
 			{
@@ -404,8 +407,15 @@ void StarGPS_parser(void const * argument)
 				{					
 				Race.odo1 += Dist;
 				Race.odo2 += Dist;
+				Race.total_distance_buf += Dist;
+				if (Race.total_distance_buf > 1)
+					{
+						Race.total_distance_buf = modf(Race.total_distance_buf, (double*)&km);
+						Race.total_distance += (int) km;
+					}
 				eeprom.odo1 = Race.odo1;
 				eeprom.odo2 = Race.odo2;
+				eeprom.total_distance = Race.total_distance;
 				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
 				
 				}
@@ -458,12 +468,19 @@ void StartButtons(void const * argument)
 			buttons_state &= ~(1 << 3);
 		  
 			if (buttons_state & 1<<0){
-				Race.odo1 += 0.1;
-				Race.odo2 += 0.1;
+				//Race.odo1 += 0.1;
+				//Race.odo2 += 0.1;
 				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
 				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
-				eeprom.odo1 = Race.odo1;
-				eeprom.odo2 = Race.odo2;
+				/*eeprom.odo1 = Race.odo1;
+				eeprom.odo2 = Race.odo2;*/
+				/*Race.total_distance_buf += 1.2;
+				if (Race.total_distance_buf > 1)
+					{
+						Race.total_distance_buf = modf(Race.total_distance_buf, (double*)&km);
+						Race.total_distance += (int) km;
+
+					}*/
 				//eeprom_write(&eeprom);
 				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
 				//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);	
@@ -473,10 +490,10 @@ void StartButtons(void const * argument)
 			}
 			if (buttons_state & 1<<1){
 				Disp.pos2++;
+				eeprom.disp_pos2 = Disp.pos2;
 			}
 			if (buttons_state & 1<<2)
 			{
-				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF); 
 				Race.odo2 = 0;
 				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
 			}
@@ -514,7 +531,7 @@ void StartTask05(void const * argument)
   for(;;)
   {
     Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096 + 0.38;
-		//a = sizeof (eeprom);
+	a = sizeof (eeprom);
 		osDelay(1000);
   }
   /* USER CODE END StartTask05 */

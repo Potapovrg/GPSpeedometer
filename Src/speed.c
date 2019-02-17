@@ -53,7 +53,7 @@ void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uin
 	if (Race->odo1 < 10.0) shift = 19;
 	else shift = 0;
 	u8g2_DrawStr(&u8g2,43+shift,64,buf);
-	if (Disp->pos2>5) Disp->pos2 = 0; 
+	if (Disp->pos2>6) Disp->pos2 = 0; 
 	switch (Disp->pos2){
 		case 0:
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
@@ -136,6 +136,16 @@ void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uin
 				u8g2_DrawStr(&u8g2,71,30,buf);
 				break;
 			}
+		break;
+		case 6:
+			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+			u8g2_SetFontDirection(&u8g2,3);
+			u8g2_DrawStr(&u8g2,14,28,"TOT");
+			u8g2_SetFontDirection(&u8g2,0);
+			u8g2_SetFont(&u8g2,u8g2_font_logisoso22_tr);
+			sprintf(buf,"%6d",Race->total_distance);
+			u8g2_DrawStr(&u8g2,38,26,buf);
+			
 		break;
 	}
 	

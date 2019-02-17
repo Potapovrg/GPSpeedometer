@@ -16,9 +16,14 @@ typedef struct {
   float odo1;
 	float odo2;
 	int32_t total_distance;
+	int8_t disp_pos1;
+	int8_t disp_pos2;
 }eeprom_struct;
 
+extern eeprom_struct eeprom;
 #endif
+
+
 
 void eeprom_read(eeprom_struct *eeprom, Display *Disp, Race_data *Race);
 void eeprom_write(eeprom_struct *eeprom);

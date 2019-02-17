@@ -6,8 +6,8 @@
 #ifndef DISPLAY_STRUCT
 #define DISPLAY_STRUCT
 typedef struct {
-	uint8_t pos1;
-	uint8_t pos2;
+	int8_t pos1;
+	int8_t pos2;
 }Display;
 #endif
 

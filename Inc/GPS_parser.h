@@ -85,6 +85,8 @@ typedef struct {
 	float odo1;
 	float odo2;
 	float voltage;
+	double total_distance_buf;
+	int32_t total_distance;
 }Race_data;
 
 #endif
