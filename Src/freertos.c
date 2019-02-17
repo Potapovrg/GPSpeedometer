@@ -111,7 +111,7 @@ uint32_t adc=0;
 int a = 0;
 uint8_t eeprom_flag = 0;
 
-double km;
+float km;
 enum mode {normal, power_off, debug};
 enum mode work_mode = normal;
 //enum mode work_mode = debug;
@@ -158,22 +158,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
 		if (UART_byte == 0x0A)
 		{
-//			xSemaphoreGiveFromISR(myBinarySemUART_ISRHandle,&xHigherPriorityTaskWoken);
 			xYieldRequired = xTaskResumeFromISR(myGPS_parserHandle);
 
      if( xYieldRequired == pdTRUE )
      {
          taskYIELD();
      }
-			//if( xHigherPriorityTaskWoken == pdTRUE ) taskYIELD();	
 		}
 		else 
 		{
 			GPS_buffer[GPS_buff_pos]=UART_byte;
 			GPS_buff_pos++;
 			if (GPS_buff_pos > BUFFSIZE - 1) GPS_buff_pos = 0; 
-			//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
-			//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		}
 	}
 	
@@ -387,18 +383,14 @@ void StarGPS_parser(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
-		//xSemaphoreTake(myBinarySemUART_ISRHandle, portMAX_DELAY);
 		DWT_CYCCNT = 0;
 		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; 
 		memcpy(GPS_buffer_rx,GPS_buffer,BUFFSIZE);
 		count_tic = DWT_CYCCNT;
 		GPS_buff_pos = 0;
-		//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Parce_NMEA_string(GPS_buffer_rx, &GPS, &Current_position);
 		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
-		//if (GPS.status != 'V')
 		{
 			if (Previous_Position.Lat != 0)
 			{
@@ -406,19 +398,17 @@ void StarGPS_parser(void const * argument)
 				//Dist = DistanceBetween(&Previous_Position,&Current_position);
 				if (Dist < 0.2)
 				{					
-				Race.odo1 += Dist;
-				Race.odo2 += Dist;
-				Race.total_distance_buf += Dist;
-				if (Race.total_distance_buf > 1)
-					{
-						Race.total_distance_buf = modf(Race.total_distance_buf, (double*)&km);
-						Race.total_distance += (int) km;
-					}
-				eeprom.odo1 = Race.odo1;
-				eeprom.odo2 = Race.odo2;
-				eeprom.total_distance = Race.total_distance;
-				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
-				
+					Race.odo1 += Dist;
+					Race.odo2 += Dist;
+					if (Race.odo1 >= 1000) Race.odo1 = 0;
+					if (Race.odo2 >= 1000) Race.odo2 = 0;
+					Race.total_distance_buf += Dist;
+					Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
+					Race.total_distance += (int) km;
+					eeprom.odo1 = Race.odo1;
+					eeprom.odo2 = Race.odo2;
+					eeprom.total_distance = Race.total_distance;
+					eeprom_flag = 1;
 				}
 			}
 				//if (Race.odo1 > 99.99) Race.odo1 = 0;
@@ -427,8 +417,6 @@ void StarGPS_parser(void const * argument)
 		}
 		//GPS_buff_pos = 0;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
-		//xSemaphoreGive(myBinarySemUART_ISRHandle);
-		//HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
 		vTaskSuspend(myGPS_parserHandle);
     //osDelay(1);
   }
@@ -520,13 +508,18 @@ void StartButtons(void const * argument)
 void StartTask05(void const * argument)
 {
   /* USER CODE BEGIN StartTask05 */
-
+	//Race.odo1 = 98;
+	//Race.total_distance = 0;
   /* Infinite loop */
   for(;;)
   {
     Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096 + 0.38;
-	a = sizeof (eeprom);
-		osDelay(1000);
+/*		a = sizeof (eeprom);
+		Race.odo1 += 0.01125;
+		Race.total_distance_buf += 0.01125;
+		Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
+		Race.total_distance += (int) km;*/
+		osDelay(100);
   }
   /* USER CODE END StartTask05 */
 }

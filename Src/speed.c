@@ -42,6 +42,12 @@ void distance_output(struct float_distance distance, int horisontal_position, in
  
 }
 
+uint8_t calculate_shift(float odo)
+{
+	if (odo < 10.0) return 38;
+	else if ((odo >= 10)&(odo < 100)) return 19;
+	else return 0;
+}
 
 void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state){
 	uint8_t shift;
@@ -50,9 +56,10 @@ void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uin
   u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 
 	sprintf(buf,"%.2f",Race->odo1);
-	if (Race->odo1 < 10.0) shift = 19;
-	else shift = 0;
-	u8g2_DrawStr(&u8g2,43+shift,64,buf);
+	//if (Race->odo1 < 10.0) shift = 19;
+	//else shift = 0;
+	shift = calculate_shift(Race->odo1);
+	u8g2_DrawStr(&u8g2,24+shift,64,buf);
 	if (Disp->pos2>6) Disp->pos2 = 0; 
 	switch (Disp->pos2){
 		case 0:
@@ -89,9 +96,8 @@ void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uin
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 			sprintf(buf,"%.2f",Race->odo2);
-			if (Race->odo2 < 10.0) shift = 19;
-			else shift = 0;
-			u8g2_DrawStr(&u8g2,43+shift,30,buf);
+			shift = calculate_shift(Race->odo2);
+			u8g2_DrawStr(&u8g2,24+shift,30,buf);
 			break;
 		case 3:
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
