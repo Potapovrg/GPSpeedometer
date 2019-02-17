@@ -109,6 +109,7 @@ uint8_t buttons_state, buttons_long_press_state;
 int i=65535;
 uint32_t adc=0;
 int a = 0;
+uint8_t eeprom_flag = 0;
 
 double km;
 enum mode {normal, power_off, debug};
@@ -192,8 +193,7 @@ void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
 {
 	switch (work_mode){
 		case power_off:
-			  //HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
-				eeprom_write(&eeprom);
+				eeprom_write(&eeprom,&eeprom_flag);
 				work_mode = normal;
 			  ADC2 ->HTR = 4095;
 				ADC2 ->LTR = 1350;
@@ -261,7 +261,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityIdle, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityHigh, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myLCD */
@@ -309,6 +309,10 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
 	osDelay(500);
+//	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
+	u8g2_InitDisplay(&u8g2);
+	u8g2_SetPowerSave(&u8g2, 0);
+	HAL_ADC_Start(&hadc2);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gga,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
@@ -346,10 +350,7 @@ void StartLCD(void const * argument)
 	SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	//Disp.pos2 = 0;
 	eeprom_read(&eeprom,&Disp,&Race);
-	//HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5); /*As odo1 & odo2 goes one after another in Race sruct 
-	//and their size is 4 bytes each we can read/write them both in one time by sending 8 bytes via HAL_I2C_Mem_Read/Write functions*/
   /* Infinite loop */
   for(;;)
   {
@@ -482,7 +483,6 @@ void StartButtons(void const * argument)
 
 					}*/
 				//eeprom_write(&eeprom);
-				//HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 8, 5);
 				//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);	
 				i -= 10000;
 				if (i < 10000) i = 65535;
@@ -491,16 +491,16 @@ void StartButtons(void const * argument)
 			if (buttons_state & 1<<1){
 				Disp.pos2++;
 				eeprom.disp_pos2 = Disp.pos2;
+				eeprom_flag = 1;
+				eeprom_write(&eeprom,&eeprom_flag);				
 			}
 			if (buttons_state & 1<<2)
 			{
 				Race.odo2 = 0;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO2_ADDRESS, 1, (uint8_t*)&Race.odo2, 4, 5);
 			}
 			if (buttons_state & 1<<3)
 			{
 				Race.odo1 = 0;
-				HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, ODO1_ADDRESS, 1, (uint8_t*)&Race.odo1, 4, 5);	//write to memory address 08
 			}
 		xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
 		osDelay(10);
@@ -520,13 +520,7 @@ void StartButtons(void const * argument)
 void StartTask05(void const * argument)
 {
   /* USER CODE BEGIN StartTask05 */
-	/*xBuffer[0]='A';
-	
-	//xBuffer[0] = 'M'; //0x4D
-  HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&af, 4, 5);	//write to memory address 08 
-	osDelay(10);
-	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, MEMORY_ADDRESS, 1, (uint8_t*)&bf, 4, 5); //read memory address 08
-*/
+
   /* Infinite loop */
   for(;;)
   {

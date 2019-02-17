@@ -16,9 +16,13 @@ void eeprom_read(eeprom_struct *eeprom, Display *Disp, Race_data *Race)
 
 }
 
-void eeprom_write(eeprom_struct *eeprom)
+void eeprom_write(eeprom_struct *eeprom, uint8_t *flag)
 {
-	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, EEPROM_1_ADDRESS, 1, (uint8_t*)eeprom,eeprom_size,10);
+	if (flag != 0)
+	{
+		HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, EEPROM_1_ADDRESS, 1, (uint8_t*)eeprom,eeprom_size,10);
+		flag = 0;
+	}
 }
 
 //void eeprom_collect_data ();

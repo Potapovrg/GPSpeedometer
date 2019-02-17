@@ -26,4 +26,4 @@ extern eeprom_struct eeprom;
 
 
 void eeprom_read(eeprom_struct *eeprom, Display *Disp, Race_data *Race);
-void eeprom_write(eeprom_struct *eeprom);
+void eeprom_write(eeprom_struct *eeprom, uint8_t *flag);

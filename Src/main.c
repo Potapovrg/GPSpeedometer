@@ -137,11 +137,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
-	u8g2_InitDisplay(&u8g2);
-	u8g2_SetPowerSave(&u8g2, 0);
+	/*u8g2_InitDisplay(&u8g2);
+	u8g2_SetPowerSave(&u8g2, 0);*/
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	TIM2->CCR1=65535;
-	HAL_ADC_Start(&hadc2);
+	//HAL_ADC_Start(&hadc2);
 	//HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_1, 5000);
 /* 
 	wake up display. Need to add display clear to this function:
