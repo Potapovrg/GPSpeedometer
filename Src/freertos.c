@@ -191,13 +191,13 @@ void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
 		case power_off:
 				eeprom_write(&eeprom,&eeprom_flag);
 				work_mode = normal;
-			  ADC2 ->HTR = 4095;
-				ADC2 ->LTR = 1350;
+			  ADC2 ->HTR = 1300;
+				ADC2 ->LTR = 0;
 			break;
 		case normal:
 				work_mode = power_off;
-				ADC2 ->HTR = 1200;
-				ADC2 ->LTR = 0;
+				ADC2 ->HTR = 4095;
+				ADC2 ->LTR = 1300;
 			break;
 		case debug:
 			__HAL_ADC_DISABLE_IT(hadc2, ADC_IT_AWD);
@@ -308,12 +308,14 @@ void StartDefaultTask(void const * argument)
 //	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
 	u8g2_InitDisplay(&u8g2);
 	u8g2_SetPowerSave(&u8g2, 0);
-	HAL_ADC_Start(&hadc2);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gga,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsv,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
+	eeprom_read(&eeprom,&Disp,&Race);
+	//osDelay(500);
+	HAL_ADC_Start(&hadc2);
 	/*HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
 	//HAL_UART_Transmit(&huart1,(uint8_t*)&gl_gps_only,28,0xFFFF);
 	//HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate_uart_only,28,0xFFFF);*/
@@ -321,9 +323,13 @@ void StartDefaultTask(void const * argument)
 /*
 	__HAL_UART_DISABLE(&huart1);
 	USART1->BRR = 640;
+	
+	
 	__HAL_UART_ENABLE(&huart1);*/
 
 	StartParcing();
+	
+	vTaskSuspend(defaultTaskHandle);
   for(;;)
   {
 
@@ -346,7 +352,6 @@ void StartLCD(void const * argument)
 	SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	eeprom_read(&eeprom,&Disp,&Race);
   /* Infinite loop */
   for(;;)
   {
@@ -480,15 +485,21 @@ void StartButtons(void const * argument)
 				Disp.pos2++;
 				eeprom.disp_pos2 = Disp.pos2;
 				eeprom_flag = 1;
-				eeprom_write(&eeprom,&eeprom_flag);				
+				//eeprom_write(&eeprom,&eeprom_flag);				
 			}
 			if (buttons_state & 1<<2)
 			{
 				Race.odo2 = 0;
+				eeprom.odo2 = Race.odo2;
+				eeprom_flag = 1;
+				
 			}
 			if (buttons_state & 1<<3)
 			{
 				Race.odo1 = 0;
+				eeprom.odo1 = Race.odo1;
+				eeprom_flag = 1;
+				
 			}
 		xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
 		osDelay(10);
@@ -513,13 +524,14 @@ void StartTask05(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096 + 0.38;
+    Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096;
+		a = HAL_ADC_GetValue(&hadc2);
 /*		a = sizeof (eeprom);
 		Race.odo1 += 0.01125;
 		Race.total_distance_buf += 0.01125;
 		Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
 		Race.total_distance += (int) km;*/
-		osDelay(100);
+		osDelay(1000);
   }
   /* USER CODE END StartTask05 */
 }
