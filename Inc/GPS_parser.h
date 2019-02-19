@@ -87,6 +87,7 @@ typedef struct {
 	float voltage;
 	double total_distance_buf;
 	int32_t total_distance;
+	int8_t backlight;
 }Race_data;
 
 #endif

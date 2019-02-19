@@ -464,22 +464,19 @@ void StartButtons(void const * argument)
 			if (buttons_state & 1<<0){
 				//Race.odo1 += 0.1;
 				//Race.odo2 += 0.1;
-				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
-				//HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
-				/*eeprom.odo1 = Race.odo1;
-				eeprom.odo2 = Race.odo2;*/
-				/*Race.total_distance_buf += 1.2;
-				if (Race.total_distance_buf > 1)
-					{
-						Race.total_distance_buf = modf(Race.total_distance_buf, (double*)&km);
-						Race.total_distance += (int) km;
-
-					}*/
-				//eeprom_write(&eeprom);
-				//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);	
-				i -= 10000;
-				if (i < 10000) i = 65535;
-				TIM2->CCR1=i;
+				Race.backlight++;
+				if (Race.backlight>1) Race.backlight=0;
+				switch (Race.backlight)
+				{
+					case 0:
+					TIM2->CCR1=65535;
+					break;
+					case 1:
+					TIM2->CCR1=10000;
+					break;
+				}
+				eeprom.backlight = Race.backlight;
+				eeprom_flag = 1;
 			}
 			if (buttons_state & 1<<1){
 				Disp.pos2++;

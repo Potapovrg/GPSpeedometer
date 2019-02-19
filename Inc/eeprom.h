@@ -18,6 +18,7 @@ typedef struct {
 	int32_t total_distance;
 	int8_t disp_pos1;
 	int8_t disp_pos2;
+	int8_t backlight;
 }eeprom_struct;
 
 extern eeprom_struct eeprom;
