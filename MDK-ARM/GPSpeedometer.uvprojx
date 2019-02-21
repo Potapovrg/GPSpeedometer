@@ -511,6 +511,11 @@
               <FileType>1</FileType>
               <FilePath>../Src/stm32f1xx_hal_timebase_tim.c</FilePath>
             </File>
+            <File>
+              <FileName>buttons.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\buttons.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

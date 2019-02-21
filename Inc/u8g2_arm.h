@@ -16,4 +16,5 @@ uint8_t u8x8_byte_arm_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *a
 void u8g2_Setup_st7920_s_128x64_f(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_cb, u8x8_msg_cb gpio_and_delay_cb);
 void SPI_Out (uint8_t Data);
  #endif  
- 
+
+

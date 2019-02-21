@@ -69,6 +69,7 @@
 #include "Simple_distance.h"
 #include "eeprom.h"
 #include "math.h"
+#include "buttons.h"
 
 /* USER CODE END Includes */
 
@@ -361,7 +362,7 @@ void StartLCD(void const * argument)
 		/*DWT_CYCCNT = 0;
 		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; */
 		u8g2_ClearBuffer(&u8g2);
-		rallycomp(&Current_position,&GPS, &Race, &Disp, buttons_state);
+		rallycomp(&GPS, &Race, &Disp);
 		u8g2_SendBuffer(&u8g2);
 		//count_tic = DWT_CYCCNT;
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
@@ -443,65 +444,11 @@ void StartButtons(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		osDelay(10);
-		if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_2))
-			buttons_state |= (1 << 0);
-    else
-      buttons_state &= ~(1 << 0);
-		if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_1))
-			buttons_state |= (1 << 1);
-    else
-      buttons_state &= ~(1 << 1);
-		if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_4))
-			buttons_state |= (1 << 2);
-    else
-			buttons_state &= ~(1 << 2);
-			if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3))
-			buttons_state |= (1 << 3);
-    else
-			buttons_state &= ~(1 << 3);
-		  
-			if (buttons_state & 1<<0){
-				//Race.odo1 += 0.1;
-				//Race.odo2 += 0.1;
-				Race.backlight++;
-				if (Race.backlight>1) Race.backlight=0;
-				switch (Race.backlight)
-				{
-					case 0:
-					TIM2->CCR1=65535;
-					break;
-					case 1:
-					TIM2->CCR1=10000;
-					break;
-				}
-				eeprom.backlight = Race.backlight;
-				eeprom_flag = 1;
-			}
-			if (buttons_state & 1<<1){
-				Disp.pos2++;
-				eeprom.disp_pos2 = Disp.pos2;
-				eeprom_flag = 1;
-				//eeprom_write(&eeprom,&eeprom_flag);				
-			}
-			if (buttons_state & 1<<2)
-			{
-				Race.odo2 = 0;
-				eeprom.odo2 = Race.odo2;
-				eeprom_flag = 1;
-				
-			}
-			if (buttons_state & 1<<3)
-			{
-				Race.odo1 = 0;
-				eeprom.odo1 = Race.odo1;
-				eeprom_flag = 1;
-				
-			}
-		xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
+		read_buttons(&buttons_state,&buttons_long_press_state);
+		buttons_events(&buttons_state,&buttons_long_press_state,&Disp, &Race,&eeprom,&eeprom_flag);
+		//xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
 		osDelay(10);
 		vTaskSuspend(myButtonsHandle);
-
   }
   /* USER CODE END StartButtons */
 }

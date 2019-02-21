@@ -2,11 +2,6 @@
 #include "speed.h"
 
 
-struct float_distance
-{
-	uint16_t kilometers;
-	uint8_t ten_meteres;
-};
 
 char buf[15];
 //uint32_t a=0;
@@ -27,20 +22,6 @@ void speedo(void) {
   u8g2_DrawBox(&u8g2,90,0,1,64);  
 }
 
-void distance_output(struct float_distance distance, int horisontal_position, int vertical_position)
-{ 
-	struct position 
-	{
-		uint8_t horisontal_position;
-		uint8_t vertical_position;
-	};
-	
- if (distance.kilometers < 10) horisontal_position = horisontal_position + 2 * 19;
- else if (distance.kilometers < 100) horisontal_position = horisontal_position + 19;
- sprintf(buf, "%i\n", distance.ten_meteres);
- u8g2_DrawStr(&u8g2,horisontal_position,vertical_position,buf);
- 
-}
 
 uint8_t calculate_shift(float odo)
 {
@@ -49,7 +30,7 @@ uint8_t calculate_shift(float odo)
 	else return 0;
 }
 
-void rallycomp(Position *Pos, GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state){
+void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 	uint8_t shift;
 	
   u8g2_SetFontDirection(&u8g2,0);
