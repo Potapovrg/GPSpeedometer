@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <math.h>
 #include "string.h"
+#include "race.h"
 
 
 #define BUFFSIZE 200
@@ -80,15 +81,6 @@ typedef struct {
 	int32_t Lat;
 	int32_t Lon;
 }Position;
-
-typedef struct {
-	float odo1;
-	float odo2;
-	float voltage;
-	double total_distance_buf;
-	int32_t total_distance;
-	int8_t backlight;
-}Race_data;
 
 #endif
 

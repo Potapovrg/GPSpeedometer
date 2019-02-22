@@ -315,6 +315,7 @@ void StartDefaultTask(void const * argument)
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsv,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
 	eeprom_read(&eeprom,&Disp,&Race);
+	if (!CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
 	//osDelay(500);
 	HAL_ADC_Start(&hadc2);
 	/*HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
@@ -358,15 +359,10 @@ void StartLCD(void const * argument)
   {
 		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
-		//xQueueReceive( myButtons_state_QueueHandle, &buttons_state, portMAX_DELAY);
 		/*DWT_CYCCNT = 0;
 		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; */
-		u8g2_ClearBuffer(&u8g2);
-		rallycomp(&GPS, &Race, &Disp);
-		u8g2_SendBuffer(&u8g2);
-		//count_tic = DWT_CYCCNT;
+		gui(&GPS, &Race, &Disp);
 		xSemaphoreGive(myBinarySemDisplay_DataHandle);
-    //osDelay(100);
   }
   /* USER CODE END StartLCD */
 }
@@ -403,11 +399,19 @@ void StarGPS_parser(void const * argument)
 				Dist = DistanceKm(&Previous_Position,&Current_position);
 				//Dist = DistanceBetween(&Previous_Position,&Current_position);
 				if (Dist < 0.2)
-				{					
-					Race.odo1 += Dist;
-					Race.odo2 += Dist;
-					if (Race.odo1 >= 1000) Race.odo1 = 0;
-					if (Race.odo2 >= 1000) Race.odo2 = 0;
+				{	
+						if (CHECK_FLAG(Race.flags,DIRECTION_FLAG))
+						{
+							Race.odo1 -= Dist;
+							Race.odo2 -= Dist;
+						}
+						else
+						{
+							Race.odo1 += Dist;
+							Race.odo2 += Dist;
+						}
+					if (Race.odo1 >= 1000||Race.odo1 < 0) Race.odo1 = 0;
+					if (Race.odo2 >= 1000||Race.odo2 < 0) Race.odo2 = 0;
 					Race.total_distance_buf += Dist;
 					Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
 					Race.total_distance += (int) km;
@@ -470,9 +474,13 @@ void StartTask05(void const * argument)
   {
     Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096;
 		a = HAL_ADC_GetValue(&hadc2);
-/*		a = sizeof (eeprom);
-		Race.odo1 += 0.01125;
-		Race.total_distance_buf += 0.01125;
+		//if (CHECK_FLAG(Race.flags,DIRECTION_FLAG)) Race.odo1 -= 0.11125;
+		//else  Race.odo1 += 0.11125;
+		
+		a = sizeof (eeprom);
+		
+		//Race.odo1 += 5.01125;
+		/*Race.total_distance_buf += 0.01125;
 		Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
 		Race.total_distance += (int) km;*/
 		osDelay(1000);

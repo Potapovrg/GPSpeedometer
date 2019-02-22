@@ -6,18 +6,28 @@
 char buf[15];
 //uint32_t a=0;
 
-void speedo(void) {         
-  u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);  
-  //u8g2_DrawStr(&u8g2,-5,30,"  0");
-	u8g2_DrawStr(&u8g2,0,30,buf);
+void speedo(GPS_data *GPS, Race_data *Race, Display *Disp) {         
+  u8g2_SetFontDirection(&u8g2,0);
+	u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
+	sprintf(buf,"%3d",GPS->Speed.kelometers);
+  u8g2_DrawStr(&u8g2,-5,30,buf);
+	//u8g2_DrawStr(&u8g2,0,30,buf);
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
   u8g2_DrawStr(&u8g2,53,30,"Km/h");
-  u8g2_DrawStr(&u8g2,0,45,"A+:40576.2");
-  u8g2_DrawStr(&u8g2,0,62,"ODO:157308");
+	u8g2_DrawStr(&u8g2,0,45,"A+");
+	//Race->odo1=999;
+	sprintf(buf,"% 4.1f",Race->odo1);
+  u8g2_DrawStr(&u8g2,30,45,buf);
+  u8g2_DrawStr(&u8g2,0,62,"ODO");
+	//Race->total_distance=999999;
+	sprintf(buf,"%6d",Race->total_distance);
+	u8g2_DrawStr(&u8g2,30,62,buf);
   u8g2_DrawStr(&u8g2,92,14,"Bat.");
-  u8g2_DrawStr(&u8g2,92,30,"13.4");
-  u8g2_DrawStr(&u8g2,92,45,"Rpm");
-  u8g2_DrawStr(&u8g2,92,62,"0000");
+	sprintf(buf,"%.1f",Race->voltage);
+  u8g2_DrawStr(&u8g2,92,30,buf);
+  u8g2_DrawStr(&u8g2,92,45,"Time");
+	sprintf(buf,"%02d%02d", GPS->Time.h+3,GPS->Time.m);
+  u8g2_DrawStr(&u8g2,92,62,buf);
   u8g2_DrawBox(&u8g2,0,32,128,1);
   u8g2_DrawBox(&u8g2,90,0,1,64);  
 }
@@ -47,7 +57,6 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 			u8g2_SetFontDirection(&u8g2,3);
 			u8g2_DrawStr(&u8g2,14,28,"SPD");
-		
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 		switch (GPS->status) {
@@ -64,7 +73,6 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 			u8g2_SetFontDirection(&u8g2,3);
 			u8g2_DrawStr(&u8g2,14,24,"TM");
-		
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_logisoso22_tr);
 			sprintf(buf,"%02d:%02d:%02d", GPS->Time.h+3,GPS->Time.m,GPS->Time.s);
@@ -73,7 +81,8 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 		case 2:
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 			u8g2_SetFontDirection(&u8g2,3);
-			u8g2_DrawStr(&u8g2,14,28,"OD2");
+			if (CHECK_FLAG(Race->flags,DIRECTION_FLAG)) u8g2_DrawStr(&u8g2,14,22,"B-");
+			else u8g2_DrawStr(&u8g2,14,22,"B+");
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 			sprintf(buf,"%.2f",Race->odo2);
@@ -115,12 +124,16 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 			switch (GPS->status) {
-				case 'V':
-				u8g2_DrawStr(&u8g2,24,30,"NO FIX");
-				break;
 				case 'A':
-				sprintf(buf,"%03d",GPS->Coarse);
-				u8g2_DrawStr(&u8g2,71,30,buf);
+					u8g2_DrawStr(&u8g2,24,30,"NO FIX");
+				break;
+				case 'V':
+					u8g2_DrawDisc(&u8g2,118,6,6,U8G2_DRAW_ALL);
+					u8g2_SetDrawColor(&u8g2,0);
+					u8g2_DrawDisc(&u8g2,118,6,3,U8G2_DRAW_ALL);
+					u8g2_SetDrawColor(&u8g2,1);
+					sprintf(buf,"%03d",GPS->Coarse);
+					u8g2_DrawStr(&u8g2,54,30,buf);
 				break;
 			}
 		break;
@@ -138,33 +151,23 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 	
   u8g2_DrawBox(&u8g2,0,31,128,2);
   u8g2_DrawBox(&u8g2,18,0,2,64);
-	/*u8g2_DrawStr(&u8g2,30,46,"Float");
-	sprintf(buf,"%02.2f",odo1);
-	u8g2_DrawStr(&u8g2,38,60,buf);
-	u8g2_DrawStr(&u8g2,90,46,"Long");
-	sprintf(buf,"%05d",odo2);
-	u8g2_DrawStr(&u8g2,80,60,buf);*/
-	
 	u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 	u8g2_SetFontDirection(&u8g2,3);
-  //u8g2_DrawStr(&u8g2,18,28,"SPD");
-	//u8g2_DrawStr(&u8g2,14,24,"TM");
-  u8g2_DrawStr(&u8g2,14,60,"OD1");
+  if (CHECK_FLAG(Race->flags,DIRECTION_FLAG)) u8g2_DrawStr(&u8g2,14,54,"A-");
+	else u8g2_DrawStr(&u8g2,14,54,"A+");
 	}
+
+	void gui(GPS_data *GPS, Race_data *Race, Display *Disp)
+	{
+		u8g2_ClearBuffer(&u8g2);
+		switch (Disp->menu_page){
+			case 0:
+				rallycomp(GPS,Race,Disp);
+			break;
+			case 1:
+				speedo(GPS,Race,Disp);
+			break;
+		}
+		u8g2_SendBuffer(&u8g2);
+	};
 	
-		//speedo();
-		/*u8g2_ClearBuffer(&u8g2);
-		u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
-		sprintf(Screen_buffer, "Time:%02d:%02d:%02d", GPS.Time.h+3,GPS.Time.m,GPS.Time.s);
-		u8g2_DrawStr(&u8g2,0,10,Screen_buffer);
-		sprintf(Screen_buffer, "%02d.%02d.%4d", GPS.Date.day,GPS.Date.month,GPS.Date.year+2000);
-		u8g2_DrawStr(&u8g2,0,20+OFFSET,Screen_buffer);
-		sprintf(Screen_buffer, "%02d %02d.%03d %c", GPS.Latitude.degrees,GPS.Latitude.minutes,GPS.Latitude.tenth_minutes,GPS.Latitude.sign);
-		u8g2_DrawStr(&u8g2,0,30+2*OFFSET,Screen_buffer);
-		sprintf(Screen_buffer, "%2d %02d.%03d %c", GPS.Longitude.degrees,GPS.Longitude.minutes,GPS.Longitude.tenth_minutes,GPS.Longitude.sign);
-		u8g2_DrawStr(&u8g2,0,40+3*OFFSET,Screen_buffer);
-		sprintf(Screen_buffer, "Status:%c", GPS.status);
-		u8g2_DrawStr(&u8g2,0,50+4*OFFSET,Screen_buffer);
-		//sprintf(Screen_buffer, "Speed:%3d.%2d",GPS.Speed.kelometers,GPS.Speed.tenth_kelometers);
-		sprintf(Screen_buffer, "DST:%1.3f",distance);
-		u8g2_DrawStr(&u8g2,0,60+5*OFFSET,Screen_buffer);*/

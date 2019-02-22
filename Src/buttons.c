@@ -1,8 +1,8 @@
 #include "buttons.h"
-
+	int8_t button_counter[NUMBER_OF_BUTTONS];
 void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 {
-	int8_t button_counter[NUMBER_OF_BUTTONS];
+
 	uint16_t Gpio_pin[NUMBER_OF_BUTTONS] = {GPIO_PIN_2,GPIO_PIN_1,GPIO_PIN_4,GPIO_PIN_3};
 	for (int8_t counter=0;counter<=20;counter++)
 	{
@@ -14,8 +14,8 @@ void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 	}
 	for (int8_t i=0; i<=NUMBER_OF_BUTTONS-1;i++)
 	{
-		if ((*(button_counter+i)>1)&&(*(button_counter+i)<=15)) *buttons_state |= (1 << i);
-		else if (*(button_counter+i)>15) *buttons_long_press_state |= (1 << i);
+		if ((*(button_counter+i)>1)&&(*(button_counter+i)<=15)) SET_FLAG(*buttons_state,i);
+		else if (*(button_counter+i)>15) SET_FLAG(*buttons_long_press_state,i);
 		*(button_counter+i)=0;
 	}
 }
@@ -23,44 +23,50 @@ void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, Race_data *Race, eeprom_struct *eeprom, uint8_t *eeprom_flag)
 {
   
-			if (*buttons_state & 1<<0){
-				//Race.odo1 += 0.1;
-				//Race.odo2 += 0.1;
-				Race->backlight++;
-				if (Race->backlight>1) Race->backlight=0;
-				switch (Race->backlight)
+			if BUTTON_PRESSED(0){
+				if (CHECK_FLAG(Race->flags,BACKLIGHT_FLAG))
 				{
-					case 0:
 					TIM2->CCR1=65535;
-					break;
-					case 1:
-					TIM2->CCR1=10000;
-					break;
+					CLEAR_FLAG(Race->flags,BACKLIGHT_FLAG);
 				}
-				eeprom->backlight = Race->backlight;
-				*eeprom_flag = 1;
-			}
-			if (*buttons_long_press_state & 1<<1){
-				Disp->pos2=3;
-				*buttons_long_press_state =0;
-				//eeprom_write(&eeprom,&eeprom_flag);				
+				else 
+				{
+					TIM2->CCR1=10000;
+					SET_FLAG(Race->flags,BACKLIGHT_FLAG);
+				}
 			}
 			
-			if (*buttons_state & 1<<1){
+			else if BUTTON_LONG_PRESSED(0){
+				Disp->menu_page++;
+				if (Disp->menu_page>1) Disp->menu_page = 0;
+			}				
+			if BUTTON_PRESSED(1){
 				Disp->pos2++;
 				eeprom->disp_pos2 = Disp->pos2;
 				*buttons_state =0;
 				*eeprom_flag = 1;
 				//eeprom_write(&eeprom,&eeprom_flag);				
 			}
+			else if BUTTON_LONG_PRESSED(1){
+				Disp->pos2=0;
+				//eeprom_write(&eeprom,&eeprom_flag);				
+			}
 			
-			if (*buttons_state & 1<<2)
+			
+			if BUTTON_PRESSED(2)
 			{
-				Race->odo2 = 0;
-				eeprom->odo2 = Race->odo2;
-				*eeprom_flag = 1;
+				if (CHECK_FLAG(Race->flags,DIRECTION_FLAG)) CLEAR_FLAG(Race->flags,DIRECTION_FLAG);
+				else SET_FLAG(Race->flags,DIRECTION_FLAG);
 				
 			}
+			else if BUTTON_LONG_PRESSED(2){
+				Race->odo2 = 0;
+				eeprom->odo2 = Race->odo2;
+				*eeprom_flag = 1;			
+			}
+			
+			
+			
 			if (*buttons_state & 1<<3)
 			{
 				Race->odo1 = 0;
@@ -68,4 +74,6 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 				*eeprom_flag = 1;
 				
 }	
+*buttons_state = 0;	
+*buttons_long_press_state = 0;
 };	
