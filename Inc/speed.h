@@ -18,6 +18,8 @@ void speedo(GPS_data *GPS, Race_data *Race, Display *Disp);
 //void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);
 void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp);
 void gui(GPS_data *GPS, Race_data *Race, Display *Disp);
+void start_sreen(void);
 uint8_t calculate_shift(float odo);
+uint8_t calculate_shift_18(float odo);
 extern u8g2_t u8g2;
 

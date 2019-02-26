@@ -1,8 +1,8 @@
 #include "buttons.h"
-	int8_t button_counter[NUMBER_OF_BUTTONS];
+
 void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 {
-
+	int8_t button_counter[NUMBER_OF_BUTTONS];
 	uint16_t Gpio_pin[NUMBER_OF_BUTTONS] = {GPIO_PIN_2,GPIO_PIN_1,GPIO_PIN_4,GPIO_PIN_3};
 	for (int8_t counter=0;counter<=20;counter++)
 	{
@@ -34,16 +34,19 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 					TIM2->CCR1=10000;
 					SET_FLAG(Race->flags,BACKLIGHT_FLAG);
 				}
+				eeprom->race_flags = Race->flags;
+				*eeprom_flag = 1;
+				//eeprom_write(eeprom,eeprom_flag);	
 			}
 			
 			else if BUTTON_LONG_PRESSED(0){
 				Disp->menu_page++;
 				if (Disp->menu_page>1) Disp->menu_page = 0;
+				eeprom->menu_page = Disp->menu_page;
 			}				
 			if BUTTON_PRESSED(1){
 				Disp->pos2++;
 				eeprom->disp_pos2 = Disp->pos2;
-				*buttons_state =0;
 				*eeprom_flag = 1;
 				//eeprom_write(&eeprom,&eeprom_flag);				
 			}

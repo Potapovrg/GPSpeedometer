@@ -281,6 +281,7 @@ void MX_FREERTOS_Init(void) {
   /* add threads, ... */
 	vTaskSuspend(myGPS_parserHandle);
 	vTaskSuspend(myButtonsHandle);
+	vTaskSuspend(myLCDHandle);
   /* USER CODE END RTOS_THREADS */
 
   /* Create the queue(s) */
@@ -305,17 +306,16 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+	start_sreen();
 	osDelay(500);
 //	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
-	u8g2_InitDisplay(&u8g2);
-	u8g2_SetPowerSave(&u8g2, 0);
-	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gga,11,0xFFFF);
+	//HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gga,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsv,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
 	eeprom_read(&eeprom,&Disp,&Race);
-	if (!CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
+	if (CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
 	//osDelay(500);
 	HAL_ADC_Start(&hadc2);
 	/*HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
@@ -330,7 +330,7 @@ void StartDefaultTask(void const * argument)
 	__HAL_UART_ENABLE(&huart1);*/
 
 	StartParcing();
-	
+	vTaskResume(myLCDHandle);
 	vTaskSuspend(defaultTaskHandle);
   for(;;)
   {
@@ -353,6 +353,7 @@ void StartLCD(void const * argument)
   /* USER CODE BEGIN StartLCD */
 	SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	TickType_t xLastWakeTime;
+	//Disp.menu_page = 1; 
 	xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
@@ -410,8 +411,8 @@ void StarGPS_parser(void const * argument)
 							Race.odo1 += Dist;
 							Race.odo2 += Dist;
 						}
-					if (Race.odo1 >= 1000||Race.odo1 < 0) Race.odo1 = 0;
-					if (Race.odo2 >= 1000||Race.odo2 < 0) Race.odo2 = 0;
+					if (Race.odo1 >= 10000||Race.odo1 < 0) Race.odo1 = 0;
+					if (Race.odo2 >= 10000||Race.odo2 < 0) Race.odo2 = 0;
 					Race.total_distance_buf += Dist;
 					Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
 					Race.total_distance += (int) km;

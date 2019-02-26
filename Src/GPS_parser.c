@@ -75,4 +75,10 @@ void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS, Position *Position)
 				sscanf(GPS_buffer+*(token_length+COARSE_POSITION),COARSE_FORMAT,&GPS->Coarse);	
 				sscanf(GPS_buffer+*(token_length+SPEED_POSITION),SPEED_FORMAT,&GPS->Speed.kelometers,&GPS->Speed.tenth_kelometers);	
 			}
+		else if (strncmp(GPS_buffer+3, "GGA", 3)==0)
+			{
+				sscanf(GPS_buffer+*(token_length+QUALITY_POSITION),QUALITY_FORMAT,&GPS->quality);	
+				sscanf(GPS_buffer+*(token_length+HDOP_POSITION),HDOP_FORMAT,&GPS->hdop);
+				sscanf(GPS_buffer+*(token_length+HEIGHT_POSITION),HEIGHT_FORMAT,&GPS->height);
+			}
 }

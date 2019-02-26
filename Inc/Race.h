@@ -1,4 +1,5 @@
-#include <stdio.h>
+//#include <stdio.h>
+#include "cmsis_os.h"
 
 #define BACKLIGHT_FLAG 0
 #define DIRECTION_FLAG 1

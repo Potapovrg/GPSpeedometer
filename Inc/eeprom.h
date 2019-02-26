@@ -19,6 +19,7 @@ typedef struct {
 	int8_t disp_pos1;
 	int8_t disp_pos2;
 	int8_t race_flags;
+	int8_t menu_page;
 }eeprom_struct;
 
 extern eeprom_struct eeprom;

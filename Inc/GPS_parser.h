@@ -26,6 +26,12 @@
 #define COARSE_POSITION 0
 #define SPEED_FORMAT "%3d.%2d"
 #define SPEED_POSITION 6
+#define QUALITY_POSITION 5
+#define QUALITY_FORMAT "%1d"
+#define HDOP_FORMAT "%2d"
+#define HDOP_POSITION 7
+#define HEIGHT_FORMAT "%4d"
+#define HEIGHT_POSITION 8
 /*#define _FORMAT
 #define _POSITION
 #define _FORMAT
@@ -39,6 +45,9 @@ typedef struct {
 	char RMC_status;
 	char VTG_status;
 	int Coarse;
+	int height;
+	int hdop;
+	int quality;
 	struct {
 		int h;
 		int m;

@@ -13,6 +13,7 @@ void eeprom_read(eeprom_struct *eeprom, Display *Disp, Race_data *Race)
 	Race->total_distance = eeprom->total_distance;
 	Disp->pos2 = eeprom->disp_pos2;
 	Race->flags = eeprom->race_flags;
+	Disp->menu_page = eeprom->menu_page;
 }
 
 void eeprom_write(eeprom_struct *eeprom, uint8_t *flag)
