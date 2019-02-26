@@ -442,11 +442,6 @@
               <FilePath>..\Src\u8g2_arm.c</FilePath>
             </File>
             <File>
-              <FileName>speed.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\speed.c</FilePath>
-            </File>
-            <File>
               <FileName>GPS_parser.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\GPS_parser.c</FilePath>
@@ -515,6 +510,11 @@
               <FileName>buttons.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\buttons.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\gui.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "speed.h"
+#include "gui.h"
 #include "GPS_parser.h"
 #include "i2c.h"
 

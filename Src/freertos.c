@@ -59,7 +59,7 @@
 #include "u8g2.h"  
 #include "u8g2_arm.h"
 #include <stdio.h>
-#include "speed.h"
+#include "gui.h"
 #include "usart.h"
 #include "i2c.h"
 #include "adc.h"

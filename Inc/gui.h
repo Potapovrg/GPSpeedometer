@@ -14,9 +14,21 @@ typedef struct {
 }Display;
 #endif
 
+#define POS1 0
+#define POS2 1
+#define VAL_POS_Y 28
+#define VAL_SHIFT 36
+#define ANOT_POS_X 14
+#define ANOT_2_POS_Y 22
+#define ANOT_3_POS_Y 28
+#define ANOT_SHIFT 32
+
 void speedo(GPS_data *GPS, Race_data *Race, Display *Disp);
 //void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);
 void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp);
+void rallycomp_2(GPS_data *GPS, Race_data *Race, Display *Disp);
+void draw_position(int8_t pos, int8_t y_shift, GPS_data *GPS, Race_data *Race);
+void draw_odo(int8_t odo,int8_t pos, int8_t y_shift,Race_data *Race);
 void gui(GPS_data *GPS, Race_data *Race, Display *Disp);
 void start_sreen(void);
 uint8_t calculate_shift(float odo);

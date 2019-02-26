@@ -46,12 +46,16 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 			}				
 			if BUTTON_PRESSED(1){
 				Disp->pos2++;
+				if (Disp->pos2==Disp->pos1) Disp->pos2++;
 				eeprom->disp_pos2 = Disp->pos2;
 				*eeprom_flag = 1;
 				//eeprom_write(&eeprom,&eeprom_flag);				
 			}
 			else if BUTTON_LONG_PRESSED(1){
-				Disp->pos2=0;
+				Disp->pos1++;
+				if (Disp->pos1==Disp->pos2) Disp->pos1++;
+				eeprom->disp_pos1 = Disp->pos1;
+				*eeprom_flag = 1;
 				//eeprom_write(&eeprom,&eeprom_flag);				
 			}
 			
