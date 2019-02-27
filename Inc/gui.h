@@ -16,12 +16,12 @@ typedef struct {
 
 #define POS1 0
 #define POS2 1
-#define VAL_POS_Y 28
-#define VAL_SHIFT 36
+#define VAL_POS_Y 30
+#define VAL_SHIFT 34
 #define ANOT_POS_X 14
 #define ANOT_2_POS_Y 22
 #define ANOT_3_POS_Y 28
-#define ANOT_SHIFT 32
+#define ANOT_SHIFT 33
 
 void speedo(GPS_data *GPS, Race_data *Race, Display *Disp);
 //void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);

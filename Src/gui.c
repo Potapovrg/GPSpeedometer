@@ -11,7 +11,7 @@ void gui(GPS_data *GPS, Race_data *Race, Display *Disp)
 		u8g2_ClearBuffer(&u8g2);
 		switch (Disp->menu_page){
 			case 0:
-				rallycomp_2 (GPS,Race,Disp);
+				rallycomp(GPS,Race,Disp);
 			break;
 			case 1:
 				speedo(GPS,Race,Disp);
@@ -20,9 +20,15 @@ void gui(GPS_data *GPS, Race_data *Race, Display *Disp)
 		u8g2_SendBuffer(&u8g2);
 	};
 	
-void rallycomp_2(GPS_data *GPS, Race_data *Race, Display *Disp){
-	if (Disp->pos1>3) Disp->pos1 = 0;
-	if (Disp->pos2>3) Disp->pos2 = 0; 
+void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
+	if (Disp->pos1>3){
+		if (Disp->pos2!=0) Disp->pos1 = 0;
+		else Disp->pos1 = 1;
+	};
+	if (Disp->pos2>3){
+		if (Disp->pos1!=0) Disp->pos2 = 0;
+		else Disp->pos2 = 1;
+	};
 	u8g2_DrawBox(&u8g2,0,31,128,2);
   u8g2_DrawBox(&u8g2,18,0,2,64);
 	draw_position(Disp->pos1,POS1,GPS,Race);
@@ -32,6 +38,7 @@ void rallycomp_2(GPS_data *GPS, Race_data *Race, Display *Disp){
 void speedo(GPS_data *GPS, Race_data *Race, Display *Disp) {         
   u8g2_SetFontDirection(&u8g2,0);
 	u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
+	if (GPS->status=='V')GPS->Speed.kelometers = 0;
 	sprintf(buf,"%3d",GPS->Speed.kelometers);
   u8g2_DrawStr(&u8g2,0,30,buf);
   u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
@@ -96,9 +103,9 @@ void draw_position(int8_t pos, int8_t y_shift, GPS_data *GPS, Race_data *Race)
 					u8g2_DrawStr(&u8g2,24,VAL_POS_Y+VAL_SHIFT*y_shift,"NO FIX");
 				break;
 				case 'A':
-					u8g2_DrawDisc(&u8g2,118,6+VAL_SHIFT*y_shift,6,U8G2_DRAW_ALL);
+					u8g2_DrawDisc(&u8g2,120,6+VAL_SHIFT*y_shift,6,U8G2_DRAW_ALL);
 					u8g2_SetDrawColor(&u8g2,0);
-					u8g2_DrawDisc(&u8g2,118,6+VAL_SHIFT*y_shift,3,U8G2_DRAW_ALL);
+					u8g2_DrawDisc(&u8g2,120,6+VAL_SHIFT*y_shift,3,U8G2_DRAW_ALL);
 					u8g2_SetDrawColor(&u8g2,1);
 					sprintf(buf,"%03d",GPS->Coarse);
 					u8g2_DrawStr(&u8g2,54,VAL_POS_Y+VAL_SHIFT*y_shift,buf);
@@ -117,7 +124,10 @@ void draw_position(int8_t pos, int8_t y_shift, GPS_data *GPS, Race_data *Race)
 					break;
 					case 'A':
 						sprintf(buf,"%3d",GPS->Speed.kelometers);
-						u8g2_DrawStr(&u8g2,71,VAL_POS_Y+VAL_SHIFT*y_shift,buf);
+						u8g2_DrawStr(&u8g2,54,VAL_POS_Y+VAL_SHIFT*y_shift,buf);
+						u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+						u8g2_DrawStr(&u8g2,110,15+VAL_SHIFT*y_shift,"km");
+						u8g2_DrawStr(&u8g2,110,30+VAL_SHIFT*y_shift,"h");
 					break;
 				}
 			break;		
@@ -150,7 +160,7 @@ void draw_odo(int8_t odo,int8_t pos,int8_t y_shift,Race_data *Race)
 	u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
 	if (*odo_val<1000) sprintf(buf,"%.2f",*odo_val);
 	else sprintf(buf,"%.1f",*odo_val);
-	u8g2_DrawStr(&u8g2,24+calculate_shift(odo),VAL_POS_Y+VAL_SHIFT*y_shift,buf);
+	u8g2_DrawStr(&u8g2,24+calculate_shift(*odo_val),VAL_POS_Y+VAL_SHIFT*y_shift,buf);
 	
 	if (CHECK_FLAG(Race->flags,DIRECTION_FLAG)) odo_dir = reverse;
 	else odo_dir = forward;
@@ -160,6 +170,17 @@ void draw_odo(int8_t odo,int8_t pos,int8_t y_shift,Race_data *Race)
 	u8g2_DrawStr(&u8g2,ANOT_POS_X,ANOT_2_POS_Y+ANOT_SHIFT*y_shift,buf);
 }
 
+void start_sreen(void){
+	u8g2_InitDisplay(&u8g2);
+	u8g2_SetPowerSave(&u8g2, 0);
+	u8g2_ClearBuffer(&u8g2);
+	u8g2_SetFontDirection(&u8g2,0);
+	u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
+	u8g2_DrawStr(&u8g2,-1,40,"GPS");
+	u8g2_DrawStr(&u8g2,53,54,"peed");
+	u8g2_SendBuffer(&u8g2);
+	}
+/*
 void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 	//uint8_t shift;
 	
@@ -276,14 +297,5 @@ void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp){
 	u8g2_SetFontDirection(&u8g2,3);
   if (CHECK_FLAG(Race->flags,DIRECTION_FLAG)) u8g2_DrawStr(&u8g2,14,54,"A-");
 	else u8g2_DrawStr(&u8g2,14,54,"A+");
-	}
+	}*/
 
-	void start_sreen(void){
-		u8g2_InitDisplay(&u8g2);
-		u8g2_SetPowerSave(&u8g2, 0);
-		u8g2_ClearBuffer(&u8g2);
-		u8g2_SetFontDirection(&u8g2,0);
-		u8g2_SetFont(&u8g2,u8g2_font_logisoso30_tr);
-		u8g2_DrawStr(&u8g2,0,40,"GPSpeed");
-		u8g2_SendBuffer(&u8g2);
-	}
