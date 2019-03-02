@@ -96,6 +96,8 @@ u8g2_t u8g2;
 #define StartParcing() HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1)
 uint32_t count_tic = 0;
 char UART_byte=0;
+uint8_t test_dma[BUFFSIZE];
+uint8_t test_rx[BUFFSIZE];
 char GPS_buffer[BUFFSIZE];
 char GPS_buffer_rx[BUFFSIZE];
 char Screen_buffer[15];
@@ -335,7 +337,9 @@ void StartDefaultTask(void const * argument)
 	
 	__HAL_UART_ENABLE(&huart1);*/
 
-	StartParcing();
+	//StartParcing();
+	__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+	HAL_UART_Receive_DMA(&huart1,test_dma,BUFFSIZE);
 	vTaskResume(myLCDHandle);
 	vTaskSuspend(defaultTaskHandle);
   for(;;)
