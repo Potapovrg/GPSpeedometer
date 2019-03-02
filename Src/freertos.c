@@ -381,7 +381,7 @@ void StarGPS_parser(void const * argument)
 		GPS_buff_pos = 0;
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		//Parce_NMEA_string(GPS_buffer_rx, &GPS, &Current_position);
-		Parce_NMEA_string_2(test_rx, &GPS, &Current_position);
+		Get_GPS_data(test_rx, &GPS, &Current_position);
 		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
 		{
 			if (Previous_Position.Lat != 0)

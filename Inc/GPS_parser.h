@@ -97,7 +97,7 @@ typedef struct {
 }NMEA_string;
 #endif
 
-//typedef enum {GNRMC,GNVTG} string_type;
-
-void Parce_NMEA_string(char *GPS_buffer, GPS_data *GPS, Position *Position);
-void Parce_NMEA_string_2(char *GPS_buffer, GPS_data *GPS, Position *Position);
+void Parse_RMC(char *GPS_buffer, GPS_data *GPS, Position *Position);
+void Parse_VTG(char *GPS_buffer, GPS_data *GPS);
+void Parse_GGA(char *GPS_buffer, GPS_data *GPS);
+void Get_GPS_data(char *GPS_buffer, GPS_data *GPS, Position *Position);
