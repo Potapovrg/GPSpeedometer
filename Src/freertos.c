@@ -97,7 +97,7 @@ u8g2_t u8g2;
 uint32_t count_tic = 0;
 char UART_byte=0;
 uint8_t test_dma[BUFFSIZE];
-uint8_t test_rx[BUFFSIZE];
+char test_rx[BUFFSIZE];
 char GPS_buffer[BUFFSIZE];
 char GPS_buffer_rx[BUFFSIZE];
 char Screen_buffer[15];
@@ -112,8 +112,9 @@ uint8_t buttons_state, buttons_long_press_state;
 int i=65535;
 uint32_t adc=0;
 int a = 0;
+uint8_t *b;
 uint8_t eeprom_flag = 0;
-
+uint8_t current_sentence;
 float km;
 enum mode {normal, power_off, debug};
 enum mode work_mode = normal;
@@ -151,33 +152,22 @@ osSemaphoreId myBinarySemButtons_ISRHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
-{
-/*	static portBASE_TYPE xHigherPriorityTaskWoken;
-	xHigherPriorityTaskWoken = pdFALSE;*/
-	BaseType_t xYieldRequired;
-	if (UartHandle->Instance == USART1)
-	{
-		HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1);
-		HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
-		if (UART_byte == 0x0A)
-		{
-			xYieldRequired = xTaskResumeFromISR(myGPS_parserHandle);
 
-     if( xYieldRequired == pdTRUE )
+void HAL_UART_RxIdleCallback(UART_HandleTypeDef *UartHandle)
+{
+	BaseType_t xYieldRequired;
+	current_sentence=DMA1_Channel5->CNDTR;
+	HAL_UART_DMAStop(&huart1);
+	memcpy(test_rx,test_dma,current_sentence);
+	HAL_UART_Receive_DMA(&huart1,test_dma,BUFFSIZE);
+	a++;
+	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
+	xYieldRequired = xTaskResumeFromISR(myGPS_parserHandle);
+  if( xYieldRequired == pdTRUE )
      {
          taskYIELD();
      }
-		}
-		else 
-		{
-			GPS_buffer[GPS_buff_pos]=UART_byte;
-			GPS_buff_pos++;
-			if (GPS_buff_pos > BUFFSIZE - 1) GPS_buff_pos = 0; 
-		}
-	}
-	
-}
+};
 
  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
@@ -187,7 +177,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
      {
          taskYIELD();
      }
-} 
+}
 
 void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
 {
@@ -310,34 +300,22 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
 	start_sreen();
-	osDelay(750);
-//	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
+	osDelay(500);
+	
 	//HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gga,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gns,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsa,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&turn_off_gsv,11,0xFFFF);
 	HAL_UART_Transmit(&huart1,(uint8_t*)&rate_5hz,14,0xFFFF);
-	//HAL_UART_Transmit(&huart1,(uint8_t*)&_57600_baudrate_uart_only,28,0xFFFF);
-	/*__HAL_UART_DISABLE(&huart1);
-	//USART1->BRR = 640;
-	USART1->BRR = 1250;	
-	__HAL_UART_ENABLE(&huart1);*/
-	eeprom_read(&eeprom,&Disp,&Race);
-	if (CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
-	//osDelay(500);
-	HAL_ADC_Start(&hadc2);
-	/*HAL_UART_Transmit(&huart1,(uint8_t*)&rate_2hz,13,0xFFFF);
-	//HAL_UART_Transmit(&huart1,(uint8_t*)&gl_gps_only,28,0xFFFF);
-	//HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate_uart_only,28,0xFFFF);*/
-	//HAL_UART_Transmit(&huart1,(uint8_t*)&uart_only,26,0xFFFF);
-/*
+	HAL_UART_Transmit(&huart1,(uint8_t*)&change_baudrate_uart_only,28,0xFFFF);
 	__HAL_UART_DISABLE(&huart1);
 	USART1->BRR = 640;
+	__HAL_UART_ENABLE(&huart1);
 	
-	
-	__HAL_UART_ENABLE(&huart1);*/
-
-	//StartParcing();
+	osDelay(250);
+	eeprom_read(&eeprom,&Disp,&Race);
+	if (CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
+	HAL_ADC_Start(&hadc2);
 	__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
 	HAL_UART_Receive_DMA(&huart1,test_dma,BUFFSIZE);
 	vTaskResume(myLCDHandle);
@@ -402,7 +380,8 @@ void StarGPS_parser(void const * argument)
 		count_tic = DWT_CYCCNT;
 		GPS_buff_pos = 0;
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
-		Parce_NMEA_string(GPS_buffer_rx, &GPS, &Current_position);
+		//Parce_NMEA_string(GPS_buffer_rx, &GPS, &Current_position);
+		Parce_NMEA_string_2(test_rx, &GPS, &Current_position);
 		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
 		{
 			if (Previous_Position.Lat != 0)
@@ -484,11 +463,11 @@ void StartTask05(void const * argument)
   for(;;)
   {
     Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096;
-		a = HAL_ADC_GetValue(&hadc2);
+		//a = HAL_ADC_GetValue(&hadc2);
 		//if (CHECK_FLAG(Race.flags,DIRECTION_FLAG)) Race.odo1 -= 0.11125;
 		//else  Race.odo1 += 0.11125;
 		
-		a = sizeof (eeprom);
+		//a = sizeof (eeprom);
 		
 		//Race.odo1 += 5.01125;
 		/*Race.total_distance_buf += 0.01125;
