@@ -5,7 +5,7 @@
 #include "race.h"
 
 
-#define BUFFSIZE 500
+#define BUFFSIZE 300
 #define TIME_FORMAT "%2d%2d%2d.%2d"
 #define TIME_POSITION 1
 #define STATUS_FORMAT "%c"

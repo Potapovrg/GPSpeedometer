@@ -11,6 +11,7 @@ void eeprom_read(eeprom_struct *eeprom, Display *Disp, Race_data *Race)
 	Race->odo1 = eeprom->odo1;
 	Race->odo2 = eeprom->odo2;
 	Race->total_distance = eeprom->total_distance;
+	Disp->pos1 = eeprom->disp_pos1;
 	Disp->pos2 = eeprom->disp_pos2;
 	Race->flags = eeprom->race_flags;
 	Disp->menu_page = eeprom->menu_page;

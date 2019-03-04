@@ -61,7 +61,7 @@ void Parse_RMC(char *GPS_buffer, GPS_data *GPS, Position *Position)
 	int32_t degrees, minutes, part_minutes;
 	
 	istr = strstr (GPS_buffer,"RMC");
-	if (istr!=NULL)
+	if ((istr!=NULL)&(strstr(istr,"*")!=NULL))
 	{
 		Tokenize(istr);
 		sscanf(istr+*(token_length+TIME_POSITION),TIME_FORMAT,&GPS->Time.h,&GPS->Time.m,&GPS->Time.s,&GPS->Time.ms);

@@ -96,10 +96,8 @@ u8g2_t u8g2;
 #define StartParcing() HAL_UART_Receive_IT(&huart1,(uint8_t *)&UART_byte,1)
 uint32_t count_tic = 0;
 char UART_byte=0;
-uint8_t test_dma[BUFFSIZE];
-char test_rx[BUFFSIZE];
+uint8_t GPS_buffer_rx[BUFFSIZE];
 char GPS_buffer[BUFFSIZE];
-char GPS_buffer_rx[BUFFSIZE];
 char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
 GPS_data GPS;
@@ -158,9 +156,6 @@ void HAL_UART_RxIdleCallback(UART_HandleTypeDef *UartHandle)
 	BaseType_t xYieldRequired;
 	current_sentence=DMA1_Channel5->CNDTR;
 	HAL_UART_DMAStop(&huart1);
-	memcpy(test_rx,test_dma,current_sentence);
-	HAL_UART_Receive_DMA(&huart1,test_dma,BUFFSIZE);
-	a++;
 	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);	
 	xYieldRequired = xTaskResumeFromISR(myGPS_parserHandle);
   if( xYieldRequired == pdTRUE )
@@ -317,7 +312,7 @@ void StartDefaultTask(void const * argument)
 	if (CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
 	HAL_ADC_Start(&hadc2);
 	__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
-	HAL_UART_Receive_DMA(&huart1,test_dma,BUFFSIZE);
+	HAL_UART_Receive_DMA(&huart1,GPS_buffer_rx,BUFFSIZE);
 	vTaskResume(myLCDHandle);
 	vTaskSuspend(defaultTaskHandle);
   for(;;)
@@ -376,12 +371,12 @@ void StarGPS_parser(void const * argument)
   {
 		DWT_CYCCNT = 0;
 		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; 
-		memcpy(GPS_buffer_rx,GPS_buffer,BUFFSIZE);
+		memcpy(GPS_buffer,GPS_buffer_rx,BUFFSIZE);
+		HAL_UART_Receive_DMA(&huart1,GPS_buffer_rx,BUFFSIZE);
 		count_tic = DWT_CYCCNT;
 		GPS_buff_pos = 0;
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
-		//Parce_NMEA_string(GPS_buffer_rx, &GPS, &Current_position);
-		Get_GPS_data(test_rx, &GPS, &Current_position);
+		Get_GPS_data(GPS_buffer,&GPS, &Current_position);
 		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
 		{
 			if (Previous_Position.Lat != 0)
@@ -467,7 +462,7 @@ void StartTask05(void const * argument)
 		//if (CHECK_FLAG(Race.flags,DIRECTION_FLAG)) Race.odo1 -= 0.11125;
 		//else  Race.odo1 += 0.11125;
 		
-		//a = sizeof (eeprom);
+		a = sizeof (eeprom);
 		
 		//Race.odo1 += 5.01125;
 		/*Race.total_distance_buf += 0.01125;
