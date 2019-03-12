@@ -10,7 +10,7 @@
 #define MEMORY_ADDRESS           0x00
 #define ODO1_ADDRESS 0x00
 #define ODO2_ADDRESS 0x04
-#define EEPROM_1_ADDRESS 0x20
+#define EEPROM_1_ADDRESS 0x00
 
 typedef struct {
   float odo1;

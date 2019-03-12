@@ -325,7 +325,10 @@ uint8_t u8x8_gpio_and_delay_arm(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void
 {
 	switch(msg)
 	{
-	case U8X8_MSG_DELAY_MILLI:
+	  case U8X8_MSG_GPIO_AND_DELAY_INIT:
+    HAL_Delay(100);
+    break;
+		case U8X8_MSG_DELAY_MILLI:
 		HAL_Delay(arg_int);
 		break;
 	case U8X8_MSG_DELAY_NANO:
@@ -339,21 +342,11 @@ uint8_t u8x8_gpio_and_delay_arm(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void
 
 uint8_t u8x8_byte_arm_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
-  uint8_t byte;
-  uint8_t *data;
- 
   switch(msg)
   {
     case U8X8_MSG_BYTE_SEND:
-      data = (uint8_t *)arg_ptr;
-      while( arg_int > 0 )
-      {
-        byte = *data;
-        data++;
-        arg_int--;
-				while(HAL_SPI_GetState(&SPI_HANDLER) == HAL_SPI_STATE_BUSY){};
-        HAL_SPI_Transmit(&hspi2, &byte, 1, 100);
-      }
+
+		HAL_SPI_Transmit(&hspi2, (uint8_t *) arg_ptr, arg_int, 10000);
       break;
     case U8X8_MSG_BYTE_START_TRANSFER:
       HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_SET);
