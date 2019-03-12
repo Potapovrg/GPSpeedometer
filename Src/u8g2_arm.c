@@ -1,6 +1,6 @@
 #include "u8g2_arm.h"
 #include "u8g2.h"
-
+#include "main.h"
 void u8g2_Setup_st7920_s_128x64_f(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_cb, u8x8_msg_cb gpio_and_delay_cb)
 {
   uint8_t tile_buf_height;
@@ -11,6 +11,33 @@ void u8g2_Setup_st7920_s_128x64_f(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_
 }
 
 uint8_t *u8g2_m_st7920_16_f(uint8_t *page_cnt)
+{
+  static uint8_t buf[1024];
+  *page_cnt = 8;
+  return buf;
+}
+
+
+void u8g2_Setup_ssd1309_128x64_noname0_f(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_cb, u8x8_msg_cb gpio_and_delay_cb)
+{
+  uint8_t tile_buf_height;
+  uint8_t *buf;
+  u8g2_SetupDisplay(u8g2, u8x8_d_ssd1309_128x64_noname0, u8x8_cad_001, byte_cb, gpio_and_delay_cb);
+  buf = u8g2_m_ssd1309_16_f(&tile_buf_height);
+  u8g2_SetupBuffer(u8g2, buf, tile_buf_height, u8g2_ll_hvline_vertical_top_lsb, rotation);
+}
+
+void u8g2_Setup_ssd1309_128x64_noname2_f(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_cb, u8x8_msg_cb gpio_and_delay_cb)
+{
+  uint8_t tile_buf_height;
+  uint8_t *buf;
+  u8g2_SetupDisplay(u8g2, u8x8_d_ssd1309_128x64_noname2, u8x8_cad_001, byte_cb, gpio_and_delay_cb);
+  buf = u8g2_m_ssd1309_16_f(&tile_buf_height);
+  u8g2_SetupBuffer(u8g2, buf, tile_buf_height, u8g2_ll_hvline_vertical_top_lsb, rotation);
+}
+
+
+uint8_t *u8g2_m_ssd1309_16_f(uint8_t *page_cnt)
 {
   static uint8_t buf[1024];
   *page_cnt = 8;
@@ -345,7 +372,6 @@ uint8_t u8x8_byte_arm_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *a
   switch(msg)
   {
     case U8X8_MSG_BYTE_SEND:
-
 		HAL_SPI_Transmit(&hspi2, (uint8_t *) arg_ptr, arg_int, 10000);
       break;
     case U8X8_MSG_BYTE_START_TRANSFER:
@@ -362,3 +388,50 @@ uint8_t u8x8_byte_arm_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *a
   return 1;
 }
 
+uint8_t u8x8_stm32_gpio_and_delay(U8X8_UNUSED u8x8_t *u8x8,
+    U8X8_UNUSED uint8_t msg, U8X8_UNUSED uint8_t arg_int,
+    U8X8_UNUSED void *arg_ptr)
+{
+  switch (msg)
+  {
+  case U8X8_MSG_GPIO_AND_DELAY_INIT:
+    HAL_Delay(1);
+    break;
+  case U8X8_MSG_DELAY_MILLI:
+    HAL_Delay(arg_int);
+    break;
+  case U8X8_MSG_GPIO_DC:
+    HAL_GPIO_WritePin(OLED_DC_GPIO_Port, OLED_DC_Pin, arg_int);
+    break;
+  case U8X8_MSG_GPIO_RESET:
+    HAL_GPIO_WritePin(OLED_RES_GPIO_Port, OLED_RES_Pin, arg_int);
+    break;
+  }
+  return 1;
+}
+
+uint8_t u8x8_byte_4wire_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,void *arg_ptr)
+{
+  switch (msg)
+  {
+  case U8X8_MSG_BYTE_SEND:
+    HAL_SPI_Transmit(&hspi2, (uint8_t *) arg_ptr, arg_int, 10000);
+    break;
+  case U8X8_MSG_BYTE_INIT:
+    break;
+  case U8X8_MSG_BYTE_SET_DC:
+    HAL_GPIO_WritePin(OLED_DC_GPIO_Port, OLED_DC_Pin, arg_int);
+    break;
+  case U8X8_MSG_BYTE_START_TRANSFER:
+	/*	HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_SET);
+      __nop(); // 21 ns*/
+    break;
+  case U8X8_MSG_BYTE_END_TRANSFER:
+			/*__nop(); // 21 ns
+      HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_RESET);*/
+    break;
+  default:
+    return 0;
+  }
+  return 1;
+}

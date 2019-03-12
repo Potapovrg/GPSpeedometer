@@ -138,7 +138,8 @@ int main(void)
   MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-	u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
+	//u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0,u8x8_byte_arm_hw_spi,u8x8_gpio_and_delay_arm);
+	u8g2_Setup_ssd1309_128x64_noname0_f(&u8g2, U8G2_R0,u8x8_byte_4wire_hw_spi,u8x8_stm32_gpio_and_delay);
 	/*u8g2_InitDisplay(&u8g2);
 	u8g2_SetPowerSave(&u8g2, 0);*/
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);

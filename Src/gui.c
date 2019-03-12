@@ -2,12 +2,13 @@
 #include "gui.h"
 int8_t x=43;
 int8_t y=15;
-
+ uint8_t contrast=255;
 char buf[15];
 //uint32_t a=0;
 
 void gui(GPS_data *GPS, Race_data *Race, Display *Disp)
 	{
+		u8x8_SetContrast((u8x8_t*)&u8g2,contrast);
 		u8g2_ClearBuffer(&u8g2);
 		switch (Disp->menu_page){
 			case 0:
