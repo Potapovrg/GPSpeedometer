@@ -1,9 +1,16 @@
 #include "buttons.h"
+#include "main.h"
 
 void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 {
 	int8_t button_counter[NUMBER_OF_BUTTONS];
+	#ifdef ST7920
 	uint16_t Gpio_pin[NUMBER_OF_BUTTONS] = {GPIO_PIN_2,GPIO_PIN_1,GPIO_PIN_4,GPIO_PIN_3};
+	#endif
+	
+	#ifdef SSD1309
+	uint16_t Gpio_pin[NUMBER_OF_BUTTONS] = {GPIO_PIN_3,GPIO_PIN_4,GPIO_PIN_1,GPIO_PIN_2};
+	#endif
 	for (int8_t counter=0;counter<=20;counter++)
 	{
 		osDelay(10);

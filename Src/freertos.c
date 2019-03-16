@@ -308,7 +308,7 @@ void StartDefaultTask(void const * argument)
 	__HAL_UART_ENABLE(&huart1);
 	
 	osDelay(250);
-	eeprom_read(&eeprom,&Disp,&Race);
+	//eeprom_read(&eeprom,&Disp,&Race);
 	if (CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
 	HAL_ADC_Start(&hadc2);
 	__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
@@ -342,8 +342,6 @@ void StartLCD(void const * argument)
   for(;;)
   {
 		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
-		Race.odo1++;
-		Race.odo2+=0.1;
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		/*DWT_CYCCNT = 0;
 		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; */
