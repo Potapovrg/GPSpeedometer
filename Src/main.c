@@ -52,6 +52,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "adc.h"
+#include "crc.h"
 #include "dma.h"
 #include "i2c.h"
 #include "spi.h"
@@ -136,6 +137,7 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   MX_ADC2_Init();
+  MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 	//Uncomment ST7920 or SSD1309 in main.h to choose screen controller type
 

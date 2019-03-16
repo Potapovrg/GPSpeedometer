@@ -2,15 +2,14 @@
 #include "gui.h"
 #include "GPS_parser.h"
 #include "i2c.h"
+#include "crc.h"
 
 #ifndef EEPROM_STRUCT
 #define EEPROM_STRUCT
 
 #define I2C1_DEVICE_ADDRESS      0x50   /* A0 = A1 = A2 = 0 */ 
-#define MEMORY_ADDRESS           0x00
-#define ODO1_ADDRESS 0x00
-#define ODO2_ADDRESS 0x04
 #define EEPROM_1_ADDRESS 0x00
+#define EEPROM_CRC_ADDRESS 0x10
 
 typedef struct {
   float odo1;
@@ -29,3 +28,4 @@ extern eeprom_struct eeprom;
 
 void eeprom_read(eeprom_struct *eeprom, Display *Disp, Race_data *Race);
 void eeprom_write(eeprom_struct *eeprom, uint8_t *flag);
+void eeprom_collect(eeprom_struct *eeprom, Display *Disp, Race_data *Race, uint8_t *flag);

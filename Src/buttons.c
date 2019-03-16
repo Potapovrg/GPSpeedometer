@@ -41,29 +41,19 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 					TIM2->CCR1=10000;
 					SET_FLAG(Race->flags,BACKLIGHT_FLAG);
 				}
-				eeprom->race_flags = Race->flags;
-				*eeprom_flag = 1;
-				//eeprom_write(eeprom,eeprom_flag);	
 			}
 			
 			else if BUTTON_LONG_PRESSED(0){
 				Disp->menu_page++;
 				if (Disp->menu_page>1) Disp->menu_page = 0;
-				eeprom->menu_page = Disp->menu_page;
 			}				
 			if BUTTON_PRESSED(1){
 				Disp->pos2++;
-				if (Disp->pos2==Disp->pos1) Disp->pos2++;
-				eeprom->disp_pos2 = Disp->pos2;
-				*eeprom_flag = 1;
-				//eeprom_write(&eeprom,&eeprom_flag);				
+				if (Disp->pos2==Disp->pos1) Disp->pos2++;		
 			}
 			else if BUTTON_LONG_PRESSED(1){
 				Disp->pos1++;
-				if (Disp->pos1==Disp->pos2) Disp->pos1++;
-				eeprom->disp_pos1 = Disp->pos1;
-				*eeprom_flag = 1;
-				//eeprom_write(&eeprom,&eeprom_flag);				
+				if (Disp->pos1==Disp->pos2) Disp->pos1++;			
 			}
 			
 			
@@ -72,11 +62,11 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 				if (CHECK_FLAG(Race->flags,DIRECTION_FLAG)) CLEAR_FLAG(Race->flags,DIRECTION_FLAG);
 				else SET_FLAG(Race->flags,DIRECTION_FLAG);
 				
+				eeprom_collect(eeprom,Disp,Race,eeprom_flag);
+				eeprom_write(eeprom,eeprom_flag);				
 			}
 			else if BUTTON_LONG_PRESSED(2){
-				Race->odo2 = 0;
-				eeprom->odo2 = Race->odo2;
-				*eeprom_flag = 1;			
+				Race->odo2 = 0;		
 			}
 			
 			
@@ -85,9 +75,8 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 			{
 				Race->odo1 = 0;
 				eeprom->odo1 = Race->odo1;
-				*eeprom_flag = 1;
-				
 }	
+eeprom_collect(eeprom,Disp,Race,eeprom_flag);
 *buttons_state = 0;	
 *buttons_long_press_state = 0;
 };	
