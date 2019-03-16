@@ -342,6 +342,8 @@ void StartLCD(void const * argument)
   for(;;)
   {
 		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );
+		Race.odo1++;
+		Race.odo2+=0.1;
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		/*DWT_CYCCNT = 0;
 		DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; */

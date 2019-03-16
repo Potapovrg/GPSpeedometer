@@ -77,7 +77,8 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+	//#define SSD1309
+	#define ST7920
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

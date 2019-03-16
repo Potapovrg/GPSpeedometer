@@ -348,46 +348,7 @@ const uint8_t u8g2_font_logisoso30_tn[475] U8G2_FONT_SECTION("u8g2_font_logisoso
   "\204\245\0\71%\357\25\234\253`\252\65MH\221 \207V\242\214\11'mX\225 K-:\354H"
   "\220\42\322fU\302R\0:\17\24\231\134C\4\12\361\20\212@!\2\0\0\0\0";
 
-uint8_t u8x8_gpio_and_delay_arm(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
-{
-	switch(msg)
-	{
-	  case U8X8_MSG_GPIO_AND_DELAY_INIT:
-    HAL_Delay(100);
-    break;
-		case U8X8_MSG_DELAY_MILLI:
-		HAL_Delay(arg_int);
-		break;
-	case U8X8_MSG_DELAY_NANO:
-		__NOP();
-	break;
-	}
-	
-	
-  return 1;
-}
-
-uint8_t u8x8_byte_arm_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
-{
-  switch(msg)
-  {
-    case U8X8_MSG_BYTE_SEND:
-		HAL_SPI_Transmit(&hspi2, (uint8_t *) arg_ptr, arg_int, 10000);
-      break;
-    case U8X8_MSG_BYTE_START_TRANSFER:
-      HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_SET);
-      __nop(); // 21 ns
-      break;
-    case U8X8_MSG_BYTE_END_TRANSFER:
-      __nop(); // 21 ns
-      HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_RESET);
-      break;
-    default:
-      return 0;
-  }
-  return 1;
-}
-
+//Thanks to Artyom Sinitsin for example https://elastic-notes.blogspot.com/2018/10/u8g2-library-usage-with-stm32-mcu.html?m=1
 uint8_t u8x8_stm32_gpio_and_delay(U8X8_UNUSED u8x8_t *u8x8,
     U8X8_UNUSED uint8_t msg, U8X8_UNUSED uint8_t arg_int,
     U8X8_UNUSED void *arg_ptr)
@@ -400,6 +361,9 @@ uint8_t u8x8_stm32_gpio_and_delay(U8X8_UNUSED u8x8_t *u8x8,
   case U8X8_MSG_DELAY_MILLI:
     HAL_Delay(arg_int);
     break;
+	case U8X8_MSG_DELAY_NANO:
+		__NOP();
+		break;
   case U8X8_MSG_GPIO_DC:
     HAL_GPIO_WritePin(OLED_DC_GPIO_Port, OLED_DC_Pin, arg_int);
     break;
@@ -410,7 +374,7 @@ uint8_t u8x8_stm32_gpio_and_delay(U8X8_UNUSED u8x8_t *u8x8,
   return 1;
 }
 
-uint8_t u8x8_byte_4wire_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,void *arg_ptr)
+uint8_t u8x8_byte_stm32_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,void *arg_ptr)
 {
   switch (msg)
   {
@@ -422,14 +386,16 @@ uint8_t u8x8_byte_4wire_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,void *
   case U8X8_MSG_BYTE_SET_DC:
     HAL_GPIO_WritePin(OLED_DC_GPIO_Port, OLED_DC_Pin, arg_int);
     break;
+	#ifdef ST7920
   case U8X8_MSG_BYTE_START_TRANSFER:
-	/*	HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_SET);
       __nop(); // 21 ns*/
     break;
   case U8X8_MSG_BYTE_END_TRANSFER:
-			/*__nop(); // 21 ns
-      HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_RESET);*/
+			__nop(); // 21 ns
+      HAL_GPIO_WritePin(CS_Port, CS, GPIO_PIN_RESET);
     break;
+	#endif
   default:
     return 0;
   }
