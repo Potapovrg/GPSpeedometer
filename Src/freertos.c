@@ -102,7 +102,9 @@ char Screen_buffer[15];
 uint8_t GPS_buff_pos = 0;
 GPS_data GPS;
 Race_data Race;
-eeprom_struct eeprom;
+//eeprom_struct eeprom;
+eeprom_race_struct eeprom_race;
+eeprom_ui_struct eeprom_ui;
 Display Disp;
 __IO ITStatus UartReady = RESET;
 Position Previous_Position,Current_position; 
@@ -178,7 +180,8 @@ void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef* hadc2)
 {
 	switch (work_mode){
 		case power_off:
-				eeprom_write(&eeprom,&eeprom_flag);
+				//eeprom_write(&eeprom,&eeprom_flag);
+				eeprom_race_write(&eeprom_race,&eeprom_flag);
 				work_mode = normal;
 			  ADC2 ->HTR = 1300;
 				ADC2 ->LTR = 0;
@@ -308,7 +311,8 @@ void StartDefaultTask(void const * argument)
 	__HAL_UART_ENABLE(&huart1);
 	
 	osDelay(250);
-	eeprom_read(&eeprom,&Disp,&Race);
+	//eeprom_read(&eeprom,&Disp,&Race);
+	eeprom_read_2(&eeprom_race,&eeprom_ui,&Race,&Disp);
 	if (CHECK_FLAG(Race.flags,BACKLIGHT_FLAG)) TIM2->CCR1=10000;
 	HAL_ADC_Start(&hadc2);
 	__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
@@ -400,8 +404,9 @@ void StarGPS_parser(void const * argument)
 					Race.total_distance_buf += Dist;
 					Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
 					Race.total_distance += (int) km;
-					eeprom_collect(&eeprom,&Disp,&Race,&eeprom_flag);
-					eeprom_flag = 1;
+					//eeprom_collect(&eeprom,&Disp,&Race,&eeprom_flag);
+					eeprom_race_collect(&eeprom_race,&Race,&eeprom_flag);
+					//eeprom_flag = 1;
 				}
 			}
 				//if (Race.odo1 > 99.99) Race.odo1 = 0;
@@ -432,9 +437,11 @@ void StartButtons(void const * argument)
   for(;;)
   {
 		read_buttons(&buttons_state,&buttons_long_press_state);
-		buttons_events(&buttons_state,&buttons_long_press_state,&Disp, &Race,&eeprom,&eeprom_flag);
+		buttons_events(&buttons_state,&buttons_long_press_state,&Disp, &Race,&eeprom_ui,&eeprom_flag);
+		eeprom_race_collect(&eeprom_race,&Race,&eeprom_flag);
 		//xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
 		osDelay(10);
+		//eeprom_race_write(&eeprom_race,&eeprom_flag);
 		vTaskSuspend(myButtonsHandle);
   }
   /* USER CODE END StartButtons */
@@ -450,22 +457,13 @@ void StartButtons(void const * argument)
 void StartTask05(void const * argument)
 {
   /* USER CODE BEGIN StartTask05 */
-	//Race.odo1 = 98;
-	//Race.total_distance = 0;
+	
   /* Infinite loop */
   for(;;)
   {
     Race.voltage = (33*((float) HAL_ADC_GetValue(&hadc2)))/4096;
-		//a = HAL_ADC_GetValue(&hadc2);
-		//if (CHECK_FLAG(Race.flags,DIRECTION_FLAG)) Race.odo1 -= 0.11125;
-		//else  Race.odo1 += 0.11125;
-		
-		a = sizeof (eeprom);
-		
-		//Race.odo1 += 5.01125;
-		/*Race.total_distance_buf += 0.01125;
-		Race.total_distance_buf = modff(Race.total_distance_buf, (float*)&km);
-		Race.total_distance += (int) km;*/
+		/*Race.odo1 += 0.1;
+		Race.odo2 += 0.23;*/
 		osDelay(1000);
   }
   /* USER CODE END StartTask05 */

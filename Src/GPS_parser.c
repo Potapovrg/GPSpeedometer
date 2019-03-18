@@ -105,6 +105,7 @@ void Parse_GGA(char *GPS_buffer, GPS_data *GPS)
 		sscanf(istr+*(token_length+QUALITY_POSITION),QUALITY_FORMAT,&GPS->quality);	
 		sscanf(istr+*(token_length+HDOP_POSITION),HDOP_FORMAT,&GPS->hdop);
 		sscanf(istr+*(token_length+HEIGHT_POSITION),HEIGHT_FORMAT,&GPS->height);
+		sscanf(istr+*(token_length+HEIGHT_CORRECTION_POSITION),HEIGHT_CORRECTION_FORMAT,&GPS->height_correction);
 	}
 	
 }

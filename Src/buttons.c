@@ -27,7 +27,7 @@ void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 	}
 }
 
-void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, Race_data *Race, eeprom_struct *eeprom, uint8_t *eeprom_flag)
+void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, Race_data *Race,eeprom_ui_struct *eeprom_ui, uint8_t *eeprom_flag)
 {
   
 			if BUTTON_PRESSED(0){
@@ -62,8 +62,8 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 				if (CHECK_FLAG(Race->flags,DIRECTION_FLAG)) CLEAR_FLAG(Race->flags,DIRECTION_FLAG);
 				else SET_FLAG(Race->flags,DIRECTION_FLAG);
 				
-				eeprom_collect(eeprom,Disp,Race,eeprom_flag);
-				eeprom_write(eeprom,eeprom_flag);				
+				//eeprom_collect(eeprom,Disp,Race,eeprom_flag);
+				//eeprom_write(eeprom,eeprom_flag);				
 			}
 			else if BUTTON_LONG_PRESSED(2){
 				Race->odo2 = 0;		
@@ -74,9 +74,10 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 			if (*buttons_state & 1<<3)
 			{
 				Race->odo1 = 0;
-				eeprom->odo1 = Race->odo1;
 }	
-eeprom_collect(eeprom,Disp,Race,eeprom_flag);
+//eeprom_collect(eeprom,Disp,Race,eeprom_flag);
+eeprom_ui_collect(eeprom_ui,Race,Disp);
+eeprom_ui_write(eeprom_ui);
 *buttons_state = 0;	
 *buttons_long_press_state = 0;
 };	

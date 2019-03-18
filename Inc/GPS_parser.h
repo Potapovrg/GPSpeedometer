@@ -32,12 +32,9 @@
 #define HDOP_POSITION 8
 #define HEIGHT_FORMAT "%4d"
 #define HEIGHT_POSITION 9
-/*#define _FORMAT
-#define _POSITION
-#define _FORMAT
-#define _POSITION*/
+#define HEIGHT_CORRECTION_FORMAT "%4d" //geoid separaration
+#define HEIGHT_CORRECTION_POSITION 11
 
-			
 #ifndef GPS_DATA_STRUCT
 #define GPS_DATA_STRUCT
 typedef struct {
@@ -46,6 +43,7 @@ typedef struct {
 	char VTG_status;
 	int Coarse;
 	int height;
+	int height_correction;
 	int hdop;
 	int quality;
 	struct {
