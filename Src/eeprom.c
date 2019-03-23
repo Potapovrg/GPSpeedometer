@@ -18,6 +18,7 @@ void eeprom_read(eeprom_struct *eeprom,Race_data *Race,Display *Disp)
 		Race->odo2 = eeprom->race.odo2;
 		Race->total_distance = eeprom->race.total_distance;
 	}
+	
 	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, EEPROM_UI_ADDRESS, 1, (uint8_t*)&eeprom->ui,EEPROM_UI_SIZE,10);
 	memcpy(crc_buf,&eeprom->ui,EEPROM_UI_SIZE-4);
 	if (eeprom->ui.crc == HAL_CRC_Calculate(&hcrc,crc_buf,(EEPROM_UI_SIZE-4)/4))
@@ -26,6 +27,14 @@ void eeprom_read(eeprom_struct *eeprom,Race_data *Race,Display *Disp)
 		Disp->pos2 = eeprom->ui.disp_pos2;
 		Race->flags = eeprom->ui.race_flags;
 		Disp->menu_page = eeprom->ui.menu_page;
+	}
+	
+	HAL_I2C_Mem_Read(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, EEPROM_TIME_ADDRESS, 1, (uint8_t*)&eeprom->time,EEPROM_TIME_SIZE,10);
+	memcpy(crc_buf,&eeprom->time,EEPROM_TIME_SIZE-4);
+	if (eeprom->time.crc == HAL_CRC_Calculate(&hcrc,crc_buf,(EEPROM_TIME_SIZE-4)/4))
+	{
+		Race->GMT.h = eeprom->time.GMT_h;
+		Race->GMT.m = eeprom->time.GMT_m;
 	}
 }
 
@@ -55,6 +64,15 @@ void eeprom_ui_collect(eeprom_struct *eeprom,Race_data *Race,Display *Disp)
 	eeprom->ui.crc = HAL_CRC_Calculate(&hcrc,crc_buf,(EEPROM_UI_SIZE-4)/4);
 };
 
+void eeprom_time_collect(eeprom_struct *eeprom,Race_data *Race,Display *Disp)
+{
+	eeprom->time.GMT_h = Race->GMT.h;
+	eeprom->time.GMT_m = Race->GMT.m;
+	
+	memcpy(crc_buf,&eeprom->time,EEPROM_TIME_SIZE-4);
+	eeprom->time.crc = HAL_CRC_Calculate(&hcrc,crc_buf,(EEPROM_TIME_SIZE-4)/4);
+};
+
 void eeprom_race_write(eeprom_struct *eeprom)
 {
 		if (eeprom->flag != 0)
@@ -67,4 +85,9 @@ void eeprom_race_write(eeprom_struct *eeprom)
 void eeprom_ui_write(eeprom_struct *eeprom)
 {
 	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, EEPROM_UI_ADDRESS, 1, (uint8_t*)&eeprom->ui,EEPROM_UI_SIZE,10);	
+}
+
+void eeprom_time_write(eeprom_struct *eeprom)
+{
+	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) I2C1_DEVICE_ADDRESS<<1, EEPROM_TIME_ADDRESS, 1, (uint8_t*)&eeprom->time,EEPROM_TIME_SIZE,10);	
 }

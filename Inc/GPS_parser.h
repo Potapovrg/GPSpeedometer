@@ -34,6 +34,10 @@
 #define HEIGHT_POSITION 9
 #define HEIGHT_CORRECTION_FORMAT "%4d" //geoid separaration
 #define HEIGHT_CORRECTION_POSITION 11
+#define GMT_HOURS_FORMAT "%2d"
+#define GMT_HOURS_POSITION 5
+#define GMT_MINUTES_FORMAT "%2d"
+#define GMT_MINUTES_POSITION 6
 
 #ifndef GPS_DATA_STRUCT
 #define GPS_DATA_STRUCT
@@ -81,21 +85,25 @@ typedef struct {
 	int32_t lat;
 	int32_t lon;
 	}Position;
-	
+	struct {
+	int hours;
+	int minutes;
+	}GMT;
 }GPS_data;
 
 typedef struct {
 	int32_t Lat;
 	int32_t Lon;
 }Position;
-
+/*
 typedef struct {
-	uint8_t start;
-	uint8_t end;
-}NMEA_string;
+	int8_t start;
+	int8_t end;
+}NMEA_string;*/
 #endif
 
 void Parse_RMC(char *GPS_buffer, GPS_data *GPS, Position *Position);
 void Parse_VTG(char *GPS_buffer, GPS_data *GPS);
 void Parse_GGA(char *GPS_buffer, GPS_data *GPS);
+void Parse_ZDA(char *GPS_buffer, GPS_data *GPS);
 void Get_GPS_data(char *GPS_buffer, GPS_data *GPS, Position *Position);

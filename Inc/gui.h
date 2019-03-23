@@ -26,7 +26,7 @@ typedef struct {
 void speedo(GPS_data *GPS, Race_data *Race, Display *Disp);
 //void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp, uint8_t buttons_state);
 void rallycomp(GPS_data *GPS, Race_data *Race, Display *Disp);
-void rallycomp_2(GPS_data *GPS, Race_data *Race, Display *Disp);
+void time(GPS_data *GPS, Race_data *Race, Display *Disp);
 void draw_position(int8_t pos, int8_t y_shift, GPS_data *GPS, Race_data *Race);
 void draw_odo(int8_t odo,int8_t pos, int8_t y_shift,Race_data *Race);
 void gui(GPS_data *GPS, Race_data *Race, Display *Disp);

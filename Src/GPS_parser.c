@@ -12,7 +12,7 @@ int nmea_string_end[10];
 int *token_length = token;
 int *str_start = nmea_string_start;
 int *str_end = nmea_string_end;
-NMEA_string RMC_string;
+//NMEA_string RMC_string;
 
 //$GNRMC,073810.00,A,5140.89642,N,03910.49043,E,0.260,,270218,,,A*69 NMEA string example
 //$GNVTG,,,,,,,,,N*2E
@@ -22,6 +22,7 @@ void Get_GPS_data(char *GPS_buffer, GPS_data *GPS, Position *Position)
 Parse_RMC(GPS_buffer,GPS,Position);
 Parse_VTG(GPS_buffer,GPS);
 Parse_GGA(GPS_buffer,GPS);
+//Parse_ZDA(GPS_buffer,GPS);
 }
 
 void Tokenize(char *GPS_buffer)
@@ -107,5 +108,16 @@ void Parse_GGA(char *GPS_buffer, GPS_data *GPS)
 		sscanf(istr+*(token_length+HEIGHT_POSITION),HEIGHT_FORMAT,&GPS->height);
 		sscanf(istr+*(token_length+HEIGHT_CORRECTION_POSITION),HEIGHT_CORRECTION_FORMAT,&GPS->height_correction);
 	}
-	
+}
+
+void Parse_ZDA(char *GPS_buffer, GPS_data *GPS)
+{
+	char *istr;
+	istr = strstr (GPS_buffer,"ZDA");
+	if (istr!=NULL)
+	{
+		Tokenize(istr);
+		sscanf(istr+*(token_length+GMT_HOURS_POSITION),GMT_HOURS_FORMAT,&GPS->GMT.hours);
+		sscanf(istr+*(token_length+GMT_MINUTES_POSITION),GMT_MINUTES_FORMAT,&GPS->GMT.minutes);
+			}
 }

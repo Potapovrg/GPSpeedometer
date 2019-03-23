@@ -1,7 +1,7 @@
 
 #include "gui.h"
-int8_t x=43;
-int8_t y=15;
+int8_t x=80;
+int8_t y=80;
  uint8_t contrast=255;
 char buf[15];
 //uint32_t a=0;
@@ -10,12 +10,16 @@ void gui(GPS_data *GPS, Race_data *Race, Display *Disp)
 	{
 		u8x8_SetContrast((u8x8_t*)&u8g2,contrast);
 		u8g2_ClearBuffer(&u8g2);
+		if (Disp->menu_page>2) Disp->menu_page = 0;
 		switch (Disp->menu_page){
 			case 0:
 				rallycomp(GPS,Race,Disp);
 			break;
 			case 1:
 				speedo(GPS,Race,Disp);
+			break;
+			case 2:
+				time(GPS,Race,Disp);
 			break;
 		}
 		u8g2_SendBuffer(&u8g2);
@@ -57,7 +61,7 @@ void speedo(GPS_data *GPS, Race_data *Race, Display *Disp) {
 	sprintf(buf,"%.1fV",Race->voltage);
   u8g2_DrawStr(&u8g2,83,14,buf);
   //u8g2_DrawStr(&u8g2,87,45,"Time");
-	sprintf(buf,"%02d:%02d", GPS->Time.h+3,GPS->Time.m);
+	sprintf(buf,"%02d:%02d", (GPS->Time.h + GPS->GMT.hours),(GPS->Time.m + GPS->GMT.minutes));
   u8g2_DrawStr(&u8g2,82,30,buf);
 	sprintf(buf,"%4dm", (GPS->height+GPS->height_correction));
 	u8g2_DrawStr(&u8g2,82,45,buf);
@@ -69,6 +73,18 @@ void speedo(GPS_data *GPS, Race_data *Race, Display *Disp) {
   u8g2_DrawBox(&u8g2,80,0,1,64);  
 }
 
+void time(GPS_data *GPS, Race_data *Race, Display *Disp) {
+	u8g2_SetFontDirection(&u8g2,0);
+	u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
+	sprintf(buf,"%02d.%02d.20%2d",GPS->Date.day,GPS->Date.month,GPS->Date.year);
+	u8g2_DrawStr(&u8g2,0,14,buf);
+	sprintf(buf,"%02d:%02d:%02d", (GPS->Time.h + Race->GMT.h),(GPS->Time.m + Race->GMT.m),GPS->Time.s);
+  u8g2_DrawStr(&u8g2,0,30,buf);
+	if (Race->GMT.h>=0) sprintf(buf,"GMT+%02d",Race->GMT.h);
+		else sprintf(buf,"GMT%02d",Race->GMT.h);
+	u8g2_DrawStr(&u8g2,74,30,buf);
+	u8g2_DrawBox(&u8g2,0,32,128,1);
+}
 uint8_t calculate_shift_18(float odo)
 {
 	if (odo < 10.0) return 27;

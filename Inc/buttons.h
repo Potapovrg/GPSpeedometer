@@ -18,5 +18,24 @@
 
 #define BUTTON_PRESSED(BIT) ((*buttons_state & 1<< BIT))
 #define BUTTON_LONG_PRESSED(BIT) ((*buttons_long_press_state & 1<< BIT))
+
+#define CHANGE_MENU_PAGE() Disp->menu_page++;\
+													 eeprom_ui_collect(eeprom,Race,Disp);\
+													 eeprom_ui_write(eeprom);
+
+#define CHANGE_BACKLIGHT_BRIGHTNESS()\
+	if (CHECK_FLAG(Race->flags,BACKLIGHT_FLAG))\
+				{\
+					TIM2->CCR1=65535;\
+					CLEAR_FLAG(Race->flags,BACKLIGHT_FLAG);\
+				}\
+				else\
+				{\
+					TIM2->CCR1=10000;\
+					SET_FLAG(Race->flags,BACKLIGHT_FLAG);\
+				}\
+				eeprom_ui_collect(eeprom,Race,Disp);\
+				eeprom_ui_write(eeprom);\
+
 void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state);
 void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, Race_data *Race,eeprom_struct *eeprom);

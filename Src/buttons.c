@@ -29,7 +29,30 @@ void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 
 void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, Race_data *Race,eeprom_struct *eeprom)
 {
-  
+  switch (Disp->menu_page){
+		case 2:
+		if BUTTON_PRESSED(0){
+			CHANGE_BACKLIGHT_BRIGHTNESS();
+		}			
+		else if BUTTON_LONG_PRESSED(0){
+				CHANGE_MENU_PAGE();
+			}
+		if BUTTON_PRESSED(1){
+			Race->GMT.h++;
+			if (Race->GMT.h>13) Race->GMT.h = -13;
+			eeprom_time_collect(eeprom,Race,Disp);
+			eeprom_time_write(eeprom);	
+		}
+		else if BUTTON_LONG_PRESSED(1){
+			Race->GMT.m +=15;
+			if (Race->GMT.m>60) Race->GMT.m = 0;
+			eeprom_time_collect(eeprom,Race,Disp);
+			eeprom_time_write(eeprom);
+		}
+			
+			break;
+		
+		default:
 			if BUTTON_PRESSED(0){
 				if (CHECK_FLAG(Race->flags,BACKLIGHT_FLAG))
 				{
@@ -46,10 +69,7 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 			}
 			
 			else if BUTTON_LONG_PRESSED(0){
-				Disp->menu_page++;
-				if (Disp->menu_page>1) Disp->menu_page = 0;
-				eeprom_ui_collect(eeprom,Race,Disp);
-				eeprom_ui_write(eeprom);
+				CHANGE_MENU_PAGE();
 			}				
 			if BUTTON_PRESSED(1){
 				Disp->pos2++;
@@ -86,6 +106,8 @@ void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, 
 				eeprom_race_collect(eeprom,Race);
 				eeprom_race_write(eeprom);
 			}	
+			
+	}
 *buttons_state = 0;	
 *buttons_long_press_state = 0;
 };	
