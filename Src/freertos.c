@@ -380,6 +380,7 @@ void StarGPS_parser(void const * argument)
 		GPS_buff_pos = 0;
 		xSemaphoreTake(myBinarySemDisplay_DataHandle,portMAX_DELAY);
 		Get_GPS_data(GPS_buffer,&GPS, &Current_position);
+		
 		if ((GPS.status != 'V')&&(GPS.Speed.kelometers>3))	
 		{
 			if (Previous_Position.Lat != 0)
@@ -434,7 +435,7 @@ void StartButtons(void const * argument)
   for(;;)
   {
 		read_buttons(&buttons_state,&buttons_long_press_state);
-		buttons_events(&buttons_state,&buttons_long_press_state,&Disp,&Race,&eeprom);
+		buttons_events(&buttons_state,&buttons_long_press_state,&Disp,&GPS,&Race,&eeprom);
 		//xQueueSendToBack(myButtons_state_QueueHandle, &buttons_state, 0);
 		osDelay(10);
 		//eeprom_race_write(&eeprom_race,&eeprom_flag);

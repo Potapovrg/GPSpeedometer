@@ -27,28 +27,71 @@ void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state)
 	}
 }
 
-void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, Race_data *Race,eeprom_struct *eeprom)
+void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, GPS_data *GPS, Race_data *Race,eeprom_struct *eeprom)
 {
   switch (Disp->menu_page){
 		case 2:
 		if BUTTON_PRESSED(0){
 			CHANGE_BACKLIGHT_BRIGHTNESS();
-		}			
+		}
+		
 		else if BUTTON_LONG_PRESSED(0){
 				CHANGE_MENU_PAGE();
 			}
+		
 		if BUTTON_PRESSED(1){
 			Race->GMT.h++;
 			if (Race->GMT.h>13) Race->GMT.h = -13;
 			eeprom_time_collect(eeprom,Race,Disp);
 			eeprom_time_write(eeprom);	
 		}
+		
 		else if BUTTON_LONG_PRESSED(1){
 			Race->GMT.m +=15;
-			if (Race->GMT.m>60) Race->GMT.m = 0;
+			if (Race->GMT.m>=60) Race->GMT.m = 0;
 			eeprom_time_collect(eeprom,Race,Disp);
 			eeprom_time_write(eeprom);
 		}
+		
+		if BUTTON_PRESSED(2){
+			Race->Timer_setup.h++;
+			if (Race->Timer_setup.h > 24) Race->Timer_setup.h = 0;
+			eeprom_time_collect(eeprom,Race,Disp);
+			eeprom_time_write(eeprom);
+			}
+		
+		else if BUTTON_LONG_PRESSED(2){
+			Race->Timer_setup.m++;
+			if (Race->Timer_setup.m >= 60) Race->Timer_setup.h = 0;
+			eeprom_time_collect(eeprom,Race,Disp);
+			eeprom_time_write(eeprom);
+			}
+		
+			if BUTTON_PRESSED(3){
+				if (CHECK_FLAG(Race->flags,TIMER_FLAG))	CLEAR_FLAG(Race->flags,TIMER_FLAG);
+					else {
+						SET_FLAG(Race->flags,TIMER_FLAG);
+						Race->Timer_start.h = GPS->Time.h;
+						Race->Timer_start.m = GPS->Time.m;
+						Race->Timer_start.s = GPS->Time.s;
+					}
+				eeprom_time_collect(eeprom,Race,Disp);
+				eeprom_time_write(eeprom);
+				HAL_Delay(5);
+				eeprom_ui_collect(eeprom,Race,Disp);
+				eeprom_ui_write(eeprom);	
+			}
+			
+			else if BUTTON_LONG_PRESSED(3){
+				CLEAR_FLAG(Race->flags,TIMER_FLAG);
+				Race->Timer_setup.h = 0;
+				Race->Timer_setup.m = 0;
+				eeprom_time_collect(eeprom,Race,Disp);
+				eeprom_time_write(eeprom);
+				HAL_Delay(5);
+				eeprom_ui_collect(eeprom,Race,Disp);
+				eeprom_ui_write(eeprom);	
+			}
 			
 			break;
 		

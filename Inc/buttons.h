@@ -38,4 +38,4 @@
 				eeprom_ui_write(eeprom);\
 
 void read_buttons(uint8_t *buttons_state,uint8_t *buttons_long_press_state);
-void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, Race_data *Race,eeprom_struct *eeprom);
+void buttons_events( uint8_t *buttons_state, uint8_t *buttons_long_press_state, Display *Disp, GPS_data *GPS, Race_data *Race,eeprom_struct *eeprom);

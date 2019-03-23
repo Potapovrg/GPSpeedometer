@@ -4,6 +4,7 @@
 #include "GPS_parser.h"
 #include "race.h"
 #include "flags.h"
+#include "timer.h"
 
 #ifndef DISPLAY_STRUCT
 #define DISPLAY_STRUCT

@@ -25,7 +25,7 @@ typedef struct {
 	float odo2;
 	uint32_t total_distance;
 	uint32_t crc;
-	}race;
+	}Race;
 	
 	struct {
   int8_t disp_pos1;
@@ -33,7 +33,7 @@ typedef struct {
 	int8_t race_flags;
 	int8_t menu_page;
 	uint32_t crc;
-	}ui;
+	}UI;
 	
 	struct {
   int8_t timer_start_h;
@@ -45,7 +45,7 @@ typedef struct {
 	int8_t GMT_m;
 	int8_t dummy; //have to add this, because struct be alicout to 4
 	uint32_t crc;
-	}time;
+	}Time;
 	
 	uint8_t flag;
 }eeprom_struct;
