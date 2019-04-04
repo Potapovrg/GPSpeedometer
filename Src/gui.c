@@ -162,7 +162,7 @@ void draw_position(int8_t pos, int8_t y_shift, GPS_data *GPS, Race_data *Race)
 		case 4:
 			u8g2_SetFont(&u8g2,u8g2_font_9x18B_tr);
 			u8g2_SetFontDirection(&u8g2,3);
-			u8g2_DrawStr(&u8g2,14,24,"TM");
+			u8g2_DrawStr(&u8g2,ANOT_POS_X,ANOT_2_POS_Y+ANOT_SHIFT*y_shift,"TM");
 		
 			u8g2_SetFontDirection(&u8g2,0);
 			u8g2_SetFont(&u8g2,u8g2_font_logisoso22_tr);
@@ -172,7 +172,7 @@ void draw_position(int8_t pos, int8_t y_shift, GPS_data *GPS, Race_data *Race)
 					sprintf(buf,"%02d:%02d:%02d",Race->Timer.h,Race->Timer.m,Race->Timer.s);
 				}
 			else sprintf(buf,"%02d:%02d:%02d",Race->Timer_setup.h,Race->Timer_setup.m,0); 
-			u8g2_DrawStr(&u8g2,20,27,buf);
+			u8g2_DrawStr(&u8g2,20,27+VAL_SHIFT*y_shift,buf);
 		break;
 	}
 }
